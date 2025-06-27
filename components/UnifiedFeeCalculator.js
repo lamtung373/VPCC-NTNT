@@ -94,24 +94,24 @@ const UnifiedFeeCalculator = () => {
 
   // Notary fee tables
   const economicFees = [
-    { min: 0, max: 50000000, fee: 50000 },
+    { min: 0, max: 49999999, fee: 50000 },
     { min: 50000000, max: 100000000, fee: 100000 },
-    { min: 100000000, max: 1000000000, rate: 0.001 },
-    { min: 1000000000, max: 3000000000, base: 1000000, rate: 0.0006 },
-    { min: 3000000000, max: 5000000000, base: 2200000, rate: 0.0005 },
-    { min: 5000000000, max: 10000000000, base: 3200000, rate: 0.0004 },
-    { min: 10000000000, max: 100000000000, base: 5200000, rate: 0.0003 },
-    { min: 100000000000, max: Infinity, base: 32200000, rate: 0.0002, maxFee: 70000000 }
+    { min: 100000001, max: 1000000000, rate: 0.001 },
+    { min: 1000000001, max: 3000000000, base: 1000000, rate: 0.0006 },
+    { min: 3000000001, max: 5000000000, base: 2200000, rate: 0.0005 },
+    { min: 5000000001, max: 10000000000, base: 3200000, rate: 0.0004 },
+    { min: 10000000001, max: 100000000000, base: 5200000, rate: 0.0003 },
+    { min: 100000000001, max: Infinity, base: 32200000, rate: 0.0002, maxFee: 70000000 }
   ];
 
   const rentalFees = [
-    { min: 0, max: 50000000, fee: 40000 },
+    { min: 0, max: 49999999, fee: 40000 },
     { min: 50000000, max: 100000000, fee: 80000 },
-    { min: 100000000, max: 1000000000, rate: 0.0008 },
-    { min: 1000000000, max: 3000000000, base: 800000, rate: 0.0006 },
-    { min: 3000000000, max: 5000000000, base: 2000000, rate: 0.0005 },
-    { min: 5000000000, max: 10000000000, base: 3000000, rate: 0.0004 },
-    { min: 10000000000, max: Infinity, base: 5000000, rate: 0.0003, maxFee: 8000000 }
+    { min: 100000001, max: 1000000000, rate: 0.0008 },
+    { min: 1000000001, max: 3000000000, base: 800000, rate: 0.0006 },
+    { min: 3000000001, max: 5000000000, base: 2000000, rate: 0.0005 },
+    { min: 5000000001, max: 10000000000, base: 3000000, rate: 0.0004 },
+    { min: 10000000001, max: Infinity, base: 5000000, rate: 0.0003, maxFee: 8000000 }
   ];
 
   // Translation calculations
@@ -169,7 +169,7 @@ const UnifiedFeeCalculator = () => {
     const feeTable = type === 'economic' ? economicFees : rentalFees;
     
     for (let tier of feeTable) {
-      if (value > tier.min && value <= tier.max) {
+      if (value >= tier.min && value <= tier.max) {
         if (tier.fee) {
           return tier.fee;
         } else if (tier.rate) {
@@ -669,6 +669,44 @@ const UnifiedFeeCalculator = () => {
                       <div>• Phí thực tế có thể thay đổi tùy theo từng trường hợp cụ thể</div>
                     </div>
                   </div>
+
+                  {/* Fee Table Info */}
+                  <div className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-lg p-5">
+                    <h3 className="font-bold text-indigo-900 mb-3 flex items-center gap-2">
+                      <Scale className="w-5 h-5" />
+                      Bảng phí công chứng hợp đồng:
+                    </h3>
+                    {contractType === 'economic' ? (
+                      <div className="text-sm text-indigo-800 space-y-1">
+                        <div className="font-semibold mb-2">Hợp đồng kinh tế, thương mại, đầu tư, kinh doanh:</div>
+                        <div>• Dưới 50 triệu: <span className="font-medium">50,000 VND</span></div>
+                        <div>• 50-100 triệu: <span className="font-medium">100,000 VND</span></div>
+                        <div>• 100 triệu - 1 tỷ: <span className="font-medium">0.1% giá trị</span></div>
+                        <div>• 1-3 tỷ: <span className="font-medium">1 triệu + 0.06% phần vượt 1 tỷ</span></div>
+                        <div>• 3-5 tỷ: <span className="font-medium">2.2 triệu + 0.05% phần vượt 3 tỷ</span></div>
+                        <div>• 5-10 tỷ: <span className="font-medium">3.2 triệu + 0.04% phần vượt 5 tỷ</span></div>
+                        <div>• 10-100 tỷ: <span className="font-medium">5.2 triệu + 0.03% phần vượt 10 tỷ</span></div>
+                        <div>• Trên 100 tỷ: <span className="font-medium">32.2 triệu + 0.02% phần vượt 100 tỷ</span></div>
+                        <div className="text-orange-600 font-semibold mt-2">⚠️ Mức thu tối đa: 70,000,000 VND</div>
+                      </div>
+                    ) : contractType === 'rental' ? (
+                      <div className="text-sm text-indigo-800 space-y-1">
+                        <div className="font-semibold mb-2">Hợp đồng thuê (đất, nhà, tài sản):</div>
+                        <div>• Dưới 50 triệu: <span className="font-medium">40,000 VND</span></div>
+                        <div>• 50-100 triệu: <span className="font-medium">80,000 VND</span></div>
+                        <div>• 100 triệu - 1 tỷ: <span className="font-medium">0.08% giá trị</span></div>
+                        <div>• 1-3 tỷ: <span className="font-medium">800 nghìn + 0.06% phần vượt 1 tỷ</span></div>
+                        <div>• 3-5 tỷ: <span className="font-medium">2 triệu + 0.05% phần vượt 3 tỷ</span></div>
+                        <div>• 5-10 tỷ: <span className="font-medium">3 triệu + 0.04% phần vượt 5 tỷ</span></div>
+                        <div>• Trên 10 tỷ: <span className="font-medium">5 triệu + 0.03% phần vượt 10 tỷ</span></div>
+                        <div className="text-orange-600 font-semibold mt-2">⚠️ Mức thu tối đa: 8,000,000 VND</div>
+                      </div>
+                    ) : (
+                      <div className="text-sm text-gray-600">
+                        Vui lòng chọn loại hợp đồng để xem bảng phí chi tiết
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -962,45 +1000,6 @@ const UnifiedFeeCalculator = () => {
                 </div>
               </div>
             )}
-
-            {/* Common Notes */}
-            <div className="mt-8 p-6 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl">
-              <h3 className="font-bold text-amber-900 mb-3 flex items-center gap-2">
-                <Copy className="w-5 h-5" />
-                Thông tin chung:
-              </h3>
-              <ul className="text-sm text-amber-800 space-y-2">
-                {activeTab === 'translation' ? (
-                  <>
-                    <li>• Một trang tối đa 350 từ (tiếng nước ngoài) hoặc 450 từ (tiếng Việt)</li>
-                    <li>• Văn bản đơn giản: giảm 70% từ trang 10, Phức tạp: giảm 80% từ trang 10</li>
-                    <li>• Phí công chứng bản đầu: 10,000đ/trang</li>
-                    <li>• Phí công chứng từ bản 2: tối đa 200,000đ/bản</li>
-                  </>
-                ) : activeTab === 'notary' ? (
-                  <>
-                    <li>• Hợp đồng kinh tế: phí tối đa 70,000,000 VND</li>
-                    <li>• Hợp đồng thuê: phí tối đa 8,000,000 VND</li>
-                    <li>• Phí được tính theo bảng lũy tiến theo giá trị hợp đồng</li>
-                    <li>• Vui lòng liên hệ văn phòng công chứng để được tư vấn chi tiết</li>
-                  </>
-                ) : activeTab === 'certification' ? (
-                  <>
-                    <li>• Phí chứng thực bản sao từ bản chính theo quy định hiện hành</li>
-                    <li>• Trang 1-2: 2,000 VND/trang</li>
-                    <li>• Từ trang 3 trở đi: 1,000 VND/trang</li>
-                    <li>• Mức thu tối đa: 200,000 VND/bản</li>
-                  </>
-                ) : (
-                  <>
-                    <li>• Phí cấp bản sao văn bản công chứng theo quy định hiện hành</li>
-                    <li>• Trang 1-2: 5,000 VND/trang</li>
-                    <li>• Từ trang 3 trở đi: 3,000 VND/trang</li>
-                    <li>• Mức thu tối đa: 100,000 VND/bản</li>
-                  </>
-                )}
-              </ul>
-            </div>
           </div>
         </div>
         
