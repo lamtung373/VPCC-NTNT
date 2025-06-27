@@ -512,16 +512,59 @@ const UnifiedFeeCalculator = () => {
                       Chi tiết tính toán:
                     </h3>
                     <div className="text-sm text-blue-800 space-y-2">
-                      <div>• Giá cơ bản: {formatCurrency(translationRates[direction][complexity][language])}/trang</div>
+                      <div>• Hướng dịch: {direction === 'to-vietnamese' ? 'Từ tiếng nước ngoài sang tiếng Việt' : 'Từ tiếng Việt sang tiếng nước ngoài'}</div>
+                      <div>• Ngôn ngữ: {languageNames[language]}</div>
                       <div>• Độ phức tạp: {complexity === 'simple' ? 'Đơn giản' : 'Phức tạp'}</div>
-                      <div>• Số trang: {parseInt(pages.replace(/\./g, '')) || 1}</div>
-                      <div>• Số bản công chứng: {parseInt(copies.replace(/\./g, '')) || 1}</div>
+                      <div>• Số trang: {parseInt(pages.replace(/\./g, '')) || 1} trang</div>
+                      <div>• Số bản công chứng: {parseInt(copies.replace(/\./g, '')) || 1} bản</div>
+                      <div>• Đơn giá dịch thuật: {formatCurrency(translationRates[direction][complexity][language])}/trang</div>
                       {isSimilarContent && (
-                        <div>• Áp dụng giảm giá cho nội dung tương tự (60% từ trang 2)</div>
+                        <div className="text-orange-600">• Nội dung tương tự: áp dụng giảm 60% từ trang 2</div>
                       )}
                       {!isSimilarContent && parseInt(pages.replace(/\./g, '')) > 9 && (
-                        <div>• Áp dụng giảm giá từ trang 10 trở đi ({complexity === 'simple' ? '70%' : '80%'})</div>
+                        <div className="text-orange-600">• Áp dụng giảm giá từ trang 10: {complexity === 'simple' ? '70%' : '80%'} giá gốc</div>
                       )}
+                      <div className="mt-2 pt-2 border-t border-blue-200">
+                        <div>• Phí dịch thuật: {formatCurrency(translationFee)}</div>
+                        <div>• Phí công chứng bản dịch: {formatCurrency(notarizationFee)}</div>
+                        <strong>Tổng cộng: {formatCurrency(totalTranslationFee)}</strong>
+                      </div>
+                      <div className="mt-3 text-xs italic">
+                        * Phí dịch thuật theo QĐ số 04/2015/QĐ-UBND tỉnh Bình Dương
+                        <br />
+                        * Phí công chứng theo Thông tư 257/2016/TT-BTC Bộ Tài chính
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Fee Table Info */}
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-5">
+                    <h3 className="font-bold text-green-900 mb-3 flex items-center gap-2">
+                      <Globe className="w-5 h-5" />
+                      Bảng phí dịch thuật:
+                    </h3>
+                    <div className="text-sm text-green-800 space-y-1">
+                      <div className="font-semibold mb-2">{direction === 'to-vietnamese' ? 'Từ tiếng nước ngoài sang tiếng Việt:' : 'Từ tiếng Việt sang tiếng nước ngoài:'}</div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <div className="font-medium underline mb-1">Văn bản đơn giản:</div>
+                          <div>• Tiếng Anh, Hoa: <span className="font-medium">{formatCurrency(translationRates[direction]['simple']['english'])}/trang</span></div>
+                          <div>• Tiếng Nga, Pháp: <span className="font-medium">{formatCurrency(translationRates[direction]['simple']['russian'])}/trang</span></div>
+                          <div>• Tiếng Hàn, Nhật, Đức: <span className="font-medium">{formatCurrency(translationRates[direction]['simple']['korean'])}/trang</span></div>
+                          <div>• Tiếng khác: <span className="font-medium">{formatCurrency(translationRates[direction]['simple']['other'])}/trang</span></div>
+                        </div>
+                        <div>
+                          <div className="font-medium underline mb-1">Văn bản phức tạp:</div>
+                          <div>• Tiếng Anh, Hoa: <span className="font-medium">{formatCurrency(translationRates[direction]['complex']['english'])}/trang</span></div>
+                          <div>• Tiếng Nga, Pháp: <span className="font-medium">{formatCurrency(translationRates[direction]['complex']['russian'])}/trang</span></div>
+                          <div>• Tiếng Hàn, Nhật, Đức: <span className="font-medium">{formatCurrency(translationRates[direction]['complex']['korean'])}/trang</span></div>
+                          <div>• Tiếng khác: <span className="font-medium">{formatCurrency(translationRates[direction]['complex']['other'])}/trang</span></div>
+                        </div>
+                      </div>
+                      <div className="text-orange-600 font-semibold mt-2">⚠️ Lưu ý:</div>
+                      <div className="text-xs">• Một trang tối đa 350 từ (tiếng nước ngoài) hoặc 450 từ (tiếng Việt)</div>
+                      <div className="text-xs">• Nội dung tương tự: giảm 60% từ trang 2</div>
+                      <div className="text-xs">• Nội dung khác nhau: giảm {complexity === 'simple' ? '70%' : '80%'} từ trang 10</div>
                     </div>
                   </div>
                 </div>
@@ -612,63 +655,110 @@ const UnifiedFeeCalculator = () => {
                   </div>
                 </div>
 
-                {/* Results */}
+                                  {/* Results */}
                 <div className="space-y-6">
                   {(contractType && parseFloat(contractValue.replace(/\./g, '')) > 0) && (
-                    <div className="bg-gradient-to-br from-indigo-500 to-blue-600 p-6 rounded-xl text-white shadow-lg animate-fadeIn">
-                      <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                        <FileText className="w-6 h-6" />
-                        Kết quả tính toán
-                      </h2>
-                      
-                      <div className="space-y-4">
-                        <div className="bg-white/20 backdrop-blur rounded-lg p-4">
-                          <div className="flex justify-between items-center">
-                            <span className="font-medium">Phí công chứng:</span>
-                            <span className="text-xl font-bold">
-                              {formatCurrency(notaryFee)}
-                            </span>
+                    <>
+                      <div className="bg-gradient-to-br from-indigo-500 to-blue-600 p-6 rounded-xl text-white shadow-lg animate-fadeIn">
+                        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                          <FileText className="w-6 h-6" />
+                          Kết quả tính toán
+                        </h2>
+                        
+                        <div className="space-y-4">
+                          <div className="bg-white/20 backdrop-blur rounded-lg p-4">
+                            <div className="flex justify-between items-center">
+                              <span className="font-medium">Phí công chứng:</span>
+                              <span className="text-xl font-bold">
+                                {formatCurrency(notaryFee)}
+                              </span>
+                            </div>
                           </div>
-                        </div>
 
-                        <div className="bg-white/20 backdrop-blur rounded-lg p-4">
-                          <div className="flex justify-between items-center">
-                            <span className="font-medium">Thù lao:</span>
-                            <span className="text-xl font-bold">
-                              {formatCurrency(parseFloat(serviceFee.replace(/\./g, '')) || 0)}
-                            </span>
+                          <div className="bg-white/20 backdrop-blur rounded-lg p-4">
+                            <div className="flex justify-between items-center">
+                              <span className="font-medium">Thù lao:</span>
+                              <span className="text-xl font-bold">
+                                {formatCurrency(parseFloat(serviceFee.replace(/\./g, '')) || 0)}
+                              </span>
+                            </div>
                           </div>
-                        </div>
 
-                        <div className="bg-white/20 backdrop-blur rounded-lg p-4">
-                          <div className="flex justify-between items-center">
-                            <span className="font-medium">Phí sao y:</span>
-                            <span className="text-xl font-bold">
-                              {formatCurrency(parseFloat(copyFee.replace(/\./g, '')) || 0)}
-                            </span>
+                          <div className="bg-white/20 backdrop-blur rounded-lg p-4">
+                            <div className="flex justify-between items-center">
+                              <span className="font-medium">Phí sao y:</span>
+                              <span className="text-xl font-bold">
+                                {formatCurrency(parseFloat(copyFee.replace(/\./g, '')) || 0)}
+                              </span>
+                            </div>
                           </div>
-                        </div>
 
-                        <div className="bg-white/30 backdrop-blur rounded-lg p-5 border-2 border-white/50">
-                          <div className="flex justify-between items-center">
-                            <span className="text-lg font-bold">TỔNG PHÍ PHẢI THANH TOÁN:</span>
-                            <span className="text-2xl font-bold">
-                              {formatCurrency(totalNotaryFee)}
-                            </span>
+                          <div className="bg-white/30 backdrop-blur rounded-lg p-5 border-2 border-white/50">
+                            <div className="flex justify-between items-center">
+                              <span className="text-lg font-bold">TỔNG PHÍ PHẢI THANH TOÁN:</span>
+                              <span className="text-2xl font-bold">
+                                {formatCurrency(totalNotaryFee)}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  )}
 
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
-                    <h3 className="font-bold text-blue-900 mb-3">📌 Lưu ý:</h3>
-                    <div className="text-sm text-blue-800 space-y-1">
-                      <div>• Bảng phí được áp dụng theo quy định hiện hành</div>
-                      <div>• Kết quả tính toán chỉ mang tính chất tham khảo</div>
-                      <div>• Phí thực tế có thể thay đổi tùy theo từng trường hợp cụ thể</div>
-                    </div>
-                  </div>
+                      {/* Calculation Details */}
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
+                        <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2">
+                          <ChevronRight className="w-5 h-5" />
+                          Chi tiết tính toán:
+                        </h3>
+                        <div className="text-sm text-blue-800 space-y-2">
+                          <div>• Loại hợp đồng: {contractType === 'economic' ? 'Kinh tế, thương mại, đầu tư, kinh doanh' : 'Thuê quyền sử dụng đất, thuê nhà ở, thuê tài sản'}</div>
+                          <div>• Giá trị hợp đồng: {formatCurrency(parseFloat(contractValue.replace(/\./g, '')) || 0)}</div>
+                          {(() => {
+                            const value = parseFloat(contractValue.replace(/\./g, '')) || 0;
+                            const feeTable = contractType === 'economic' ? economicFees : rentalFees;
+                            let tier = null;
+                            
+                            for (let t of feeTable) {
+                              if (value >= t.min && value <= t.max) {
+                                tier = t;
+                                break;
+                              }
+                            }
+                            
+                            if (tier) {
+                              if (tier.fee) {
+                                return <div>• Mức áp dụng: {formatCurrency(tier.fee)} (mức cố định)</div>;
+                              } else if (tier.rate) {
+                                return <div>• Mức áp dụng: {tier.base ? formatCurrency(tier.base) + ' + ' : ''}{(tier.rate * 100).toFixed(2)}% {tier.base ? 'phần vượt' : 'giá trị hợp đồng'}</div>;
+                              }
+                            }
+                            return null;
+                          })()}
+                          <div className="mt-2 pt-2 border-t border-blue-200">
+                            <div>• Phí công chứng: {formatCurrency(notaryFee)}</div>
+                            {parseFloat(serviceFee.replace(/\./g, '')) > 0 && (
+                              <div>• Thù lao: {formatCurrency(parseFloat(serviceFee.replace(/\./g, '')) || 0)}</div>
+                            )}
+                            {parseFloat(copyFee.replace(/\./g, '')) > 0 && (
+                              <div>• Phí sao y: {formatCurrency(parseFloat(copyFee.replace(/\./g, '')) || 0)}</div>
+                            )}
+                            <strong>Tổng cộng: {formatCurrency(totalNotaryFee)}</strong>
+                          </div>
+                          {(() => {
+                            const value = parseFloat(contractValue.replace(/\./g, '')) || 0;
+                            const maxFee = contractType === 'economic' ? 70000000 : 8000000;
+                            if (notaryFee === maxFee) {
+                              return <div className="text-orange-600 font-semibold mt-2">⚠️ Đã áp dụng mức phí tối đa: {formatCurrency(maxFee)}</div>;
+                            }
+                            return null;
+                          })()}
+                          <div className="mt-3 text-xs italic">
+                            * Áp dụng theo Thông tư 257/2016/TT-BTC Bộ Tài chính
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
 
                   {/* Fee Table Info */}
                   <div className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-lg p-5">
@@ -850,6 +940,9 @@ const UnifiedFeeCalculator = () => {
                       <div className="mt-2 pt-2 border-t border-blue-200">
                         <strong>Tổng cộng: {formatCurrency(certificationFee)}</strong>
                       </div>
+                      <div className="mt-3 text-xs italic">
+                        * Áp dụng theo Thông tư 257/2016/TT-BTC Bộ Tài chính
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -995,6 +1088,9 @@ const UnifiedFeeCalculator = () => {
                       <div className="mt-2 pt-2 border-t border-blue-200">
                         <strong>Tổng cộng: {formatCurrency(notarizedCopyFee)}</strong>
                       </div>
+                      <div className="mt-3 text-xs italic">
+                        * Áp dụng theo Thông tư 257/2016/TT-BTC Bộ Tài chính
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1004,10 +1100,16 @@ const UnifiedFeeCalculator = () => {
         </div>
         
         {/* Footer */}
-        <div className="mt-8 text-center py-4">
-          <p className="text-sm text-gray-600">
-            © {new Date().getFullYear()} VPCC Nguyễn Thị Như Trang - Nguyễn Tùng Lâm. All rights reserved.
-          </p>
+        <div className="mt-8 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-lg shadow-xl p-6">
+          <div className="text-center">
+            <p className="text-white font-bold text-lg flex items-center justify-center gap-2">
+              <Scale className="w-5 h-5" />
+              © {new Date().getFullYear()} VPCC Nguyễn Thị Như Trang - Nguyễn Tùng Lâm
+            </p>
+            <p className="text-blue-100 text-sm mt-1">
+              Văn phòng công chứng Chính xác - Nhanh chóng - Chuyên nghiệp
+            </p>
+          </div>
         </div>
       </div>
     </div>
