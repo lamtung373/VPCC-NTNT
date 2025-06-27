@@ -913,9 +913,34 @@ const UnifiedFeeCalculator = () => {
                       {(() => {
                         const pagesNum = parseInt(certPages.replace(/\./g, '')) || 1;
                         const copiesNum = parseInt(certCopies.replace(/\./g, '')) || 1;
-                        let details = [];
                         
-                        for (let i = 1; i <= copiesNum; i++) {
+                        if (copiesNum <= 5) {
+                          // Hiển thị chi tiết từng bản nếu <= 5 bản
+                          let details = [];
+                          
+                          for (let i = 1; i <= copiesNum; i++) {
+                            let copyFee = 0;
+                            const firstTwo = Math.min(pagesNum, 2);
+                            copyFee += firstTwo * 2000;
+                            
+                            if (pagesNum > 2) {
+                              copyFee += (pagesNum - 2) * 1000;
+                            }
+                            
+                            const actualFee = Math.min(copyFee, 200000);
+                            const hitMax = copyFee > 200000;
+                            
+                            details.push(
+                              <div key={i}>
+                                • Bản {i}: {formatCurrency(actualFee)} 
+                                {hitMax && <span className="text-orange-600"> (đã áp dụng mức tối đa)</span>}
+                              </div>
+                            );
+                          }
+                          
+                          return details;
+                        } else {
+                          // Hiển thị tóm tắt nếu > 5 bản
                           let copyFee = 0;
                           const firstTwo = Math.min(pagesNum, 2);
                           copyFee += firstTwo * 2000;
@@ -927,15 +952,29 @@ const UnifiedFeeCalculator = () => {
                           const actualFee = Math.min(copyFee, 200000);
                           const hitMax = copyFee > 200000;
                           
-                          details.push(
-                            <div key={i}>
-                              • Bản {i}: {formatCurrency(actualFee)} 
-                              {hitMax && <span className="text-orange-600"> (đã áp dụng mức tối đa)</span>}
-                            </div>
+                          return (
+                            <>
+                              <div>• Số bản: {copiesNum} bản</div>
+                              <div>• Phí mỗi bản: {formatCurrency(actualFee)} {hitMax && <span className="text-orange-600">(đã áp dụng mức tối đa)</span>}</div>
+                              <div>• Chi tiết tính phí 1 bản:</div>
+                              <div className="ml-4 text-xs">
+                                - Trang 1-2: {Math.min(pagesNum, 2)} trang × 2,000 = {formatCurrency(Math.min(pagesNum, 2) * 2000)}
+                                {pagesNum > 2 && (
+                                  <>
+                                    <br />
+                                    - Từ trang 3: {pagesNum - 2} trang × 1,000 = {formatCurrency((pagesNum - 2) * 1000)}
+                                  </>
+                                )}
+                                {hitMax && (
+                                  <>
+                                    <br />
+                                    - Tổng: {formatCurrency(copyFee)} → Áp dụng mức tối đa: {formatCurrency(200000)}
+                                  </>
+                                )}
+                              </div>
+                            </>
                           );
                         }
-                        
-                        return details;
                       })()}
                       <div className="mt-2 pt-2 border-t border-blue-200">
                         <strong>Tổng cộng: {formatCurrency(certificationFee)}</strong>
@@ -1061,9 +1100,34 @@ const UnifiedFeeCalculator = () => {
                       {(() => {
                         const pagesNum = parseInt(notarizedPages.replace(/\./g, '')) || 1;
                         const copiesNum = parseInt(notarizedCopies.replace(/\./g, '')) || 1;
-                        let details = [];
                         
-                        for (let i = 1; i <= copiesNum; i++) {
+                        if (copiesNum <= 5) {
+                          // Hiển thị chi tiết từng bản nếu <= 5 bản
+                          let details = [];
+                          
+                          for (let i = 1; i <= copiesNum; i++) {
+                            let copyFee = 0;
+                            const firstTwo = Math.min(pagesNum, 2);
+                            copyFee += firstTwo * 5000;
+                            
+                            if (pagesNum > 2) {
+                              copyFee += (pagesNum - 2) * 3000;
+                            }
+                            
+                            const actualFee = Math.min(copyFee, 100000);
+                            const hitMax = copyFee > 100000;
+                            
+                            details.push(
+                              <div key={i}>
+                                • Bản sao {i}: {formatCurrency(actualFee)} 
+                                {hitMax && <span className="text-orange-600"> (đã áp dụng mức tối đa)</span>}
+                              </div>
+                            );
+                          }
+                          
+                          return details;
+                        } else {
+                          // Hiển thị tóm tắt nếu > 5 bản
                           let copyFee = 0;
                           const firstTwo = Math.min(pagesNum, 2);
                           copyFee += firstTwo * 5000;
@@ -1075,15 +1139,29 @@ const UnifiedFeeCalculator = () => {
                           const actualFee = Math.min(copyFee, 100000);
                           const hitMax = copyFee > 100000;
                           
-                          details.push(
-                            <div key={i}>
-                              • Bản sao {i}: {formatCurrency(actualFee)} 
-                              {hitMax && <span className="text-orange-600"> (đã áp dụng mức tối đa)</span>}
-                            </div>
+                          return (
+                            <>
+                              <div>• Số bản sao: {copiesNum} bản</div>
+                              <div>• Phí mỗi bản: {formatCurrency(actualFee)} {hitMax && <span className="text-orange-600">(đã áp dụng mức tối đa)</span>}</div>
+                              <div>• Chi tiết tính phí 1 bản:</div>
+                              <div className="ml-4 text-xs">
+                                - Trang 1-2: {Math.min(pagesNum, 2)} trang × 5,000 = {formatCurrency(Math.min(pagesNum, 2) * 5000)}
+                                {pagesNum > 2 && (
+                                  <>
+                                    <br />
+                                    - Từ trang 3: {pagesNum - 2} trang × 3,000 = {formatCurrency((pagesNum - 2) * 3000)}
+                                  </>
+                                )}
+                                {hitMax && (
+                                  <>
+                                    <br />
+                                    - Tổng: {formatCurrency(copyFee)} → Áp dụng mức tối đa: {formatCurrency(100000)}
+                                  </>
+                                )}
+                              </div>
+                            </>
                           );
                         }
-                        
-                        return details;
                       })()}
                       <div className="mt-2 pt-2 border-t border-blue-200">
                         <strong>Tổng cộng: {formatCurrency(notarizedCopyFee)}</strong>
@@ -1107,7 +1185,10 @@ const UnifiedFeeCalculator = () => {
               © {new Date().getFullYear()} VPCC Nguyễn Thị Như Trang - Nguyễn Tùng Lâm
             </p>
             <p className="text-blue-100 text-sm mt-1">
-              Văn phòng công chứng Chính xác - Nhanh chóng - Chuyên nghiệp
+              Chính xác - Nhanh chóng - Chuyên nghiệp
+            </p>
+            <p className="text-blue-200 text-xs mt-1">
+              Phiên bản 0.1
             </p>
           </div>
         </div>
