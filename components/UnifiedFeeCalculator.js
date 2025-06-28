@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Calculator, FileText, Copy, Globe, Scale, ChevronRight, FileCheck } from 'lucide-react';
+import { Calculator, FileText, Copy, Globe, Scale, ChevronRight, FileCheck, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/router';
 
 const UnifiedFeeCalculator = () => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('translation');
   
   // Translation states
@@ -302,9 +304,21 @@ const UnifiedFeeCalculator = () => {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-t-2xl p-8 text-white shadow-xl">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Calculator className="w-10 h-10" />
-            <h1 className="text-3xl md:text-4xl font-bold">Công Cụ Tính Phí Công Chứng</h1>
+          <div className="flex items-center justify-between mb-4">
+            <button
+              onClick={() => router.push('/')}
+              className="flex items-center gap-2 text-blue-100 hover:text-white transition-colors duration-200 bg-white/10 backdrop-blur rounded-lg px-3 py-2 hover:bg-white/20"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              <span className="text-sm font-medium">Trang chủ</span>
+            </button>
+            
+            <div className="flex items-center gap-3">
+              <Calculator className="w-10 h-10" />
+              <h1 className="text-3xl md:text-4xl font-bold">Công Cụ Tính Phí Công Chứng</h1>
+            </div>
+            
+            <div className="w-20"></div> {/* Spacer for balance */}
           </div>
           <p className="text-center text-blue-100 text-lg">Tính toán nhanh chóng và chính xác phí dịch thuật và công chứng</p>
         </div>
