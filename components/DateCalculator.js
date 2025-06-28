@@ -12,6 +12,8 @@ const DateCalculator = () => {
   const [addMonths, setAddMonths] = useState('');
   const [addYears, setAddYears] = useState('');
   const [resultDate, setResultDate] = useState('');
+  const [excludeWeekendsAdd, setExcludeWeekendsAdd] = useState(false);
+  const [excludeHolidaysAdd, setExcludeHolidaysAdd] = useState(false);
   
   // Date Difference states
   const [fromDate, setFromDate] = useState('');
@@ -19,6 +21,8 @@ const DateCalculator = () => {
   const [daysDifference, setDaysDifference] = useState(0);
   const [monthsDifference, setMonthsDifference] = useState(0);
   const [yearsDifference, setYearsDifference] = useState(0);
+  const [excludeWeekendsDiff, setExcludeWeekendsDiff] = useState(false);
+  const [excludeHolidaysDiff, setExcludeHolidaysDiff] = useState(false);
   
   // Working Days states
   const [workFromDate, setWorkFromDate] = useState('');
@@ -28,40 +32,70 @@ const DateCalculator = () => {
   const [weekendDays, setWeekendDays] = useState(0);
   const [holidayDays, setHolidayDays] = useState(0);
 
-  // Danh sách ngày lễ Việt Nam (có thể cấu hình)
-  const vietnamHolidays = [
-    // 2024
-    '2024-01-01', // Tết Dương lịch
-    '2024-02-08', '2024-02-09', '2024-02-10', '2024-02-11', '2024-02-12', '2024-02-13', '2024-02-14', // Tết Nguyên đán
-    '2024-04-18', // Giỗ tổ Hùng Vương
-    '2024-04-29', '2024-04-30', '2024-05-01', // 30/4 - 1/5
-    '2024-09-02', // Quốc Khánh
+  // Danh sách ngày lễ Việt Nam cố định (không phụ thuộc năm cụ thể)
+  const getVietnamHolidays = (year) => {
+    const holidays = [];
     
-    // 2025
-    '2025-01-01', // Tết Dương lịch
-    '2025-01-27', '2025-01-28', '2025-01-29', '2025-01-30', '2025-01-31', '2025-02-01', '2025-02-02', // Tết Nguyên đán 2025
-    '2025-04-18', // Giỗ tổ Hùng Vương
-    '2025-04-29', '2025-04-30', '2025-05-01', // 30/4 - 1/5
-    '2025-09-02', // Quốc Khánh
+    // Ngày lễ cố định
+    holidays.push(`${year}-01-01`); // Tết Dương lịch
+    holidays.push(`${year}-04-30`); // Ngày Giải phóng miền Nam
+    holidays.push(`${year}-05-01`); // Ngày Quốc tế Lao động
+    holidays.push(`${year}-09-02`); // Ngày Quốc khánh
     
-    // 2026
-    '2026-01-01', // Tết Dương lịch
-    '2026-02-16', '2026-02-17', '2026-02-18', '2026-02-19', '2026-02-20', '2026-02-21', '2026-02-22', // Tết Nguyên đán 2026
-    '2026-04-18', // Giỗ tổ Hùng Vương
-    '2026-04-29', '2026-04-30', '2026-05-01', // 30/4 - 1/5
-    '2026-09-02', // Quốc Khánh
-  ];
+    // Tết Nguyên đán (7 ngày) - cần tính theo âm lịch
+    // Đây là xấp xỉ, trong thực tế cần dùng thư viện chuyển đổi lịch
+    const tetDates = getTetDates(year);
+    holidays.push(...tetDates);
+    
+    // Giỗ tổ Hùng Vương (10/3 âm lịch) - xấp xỉ
+    const hungKingDate = getHungKingDate(year);
+    if (hungKingDate) holidays.push(hungKingDate);
+    
+    return holidays;
+  };
+
+  // Hàm tính ngày Tết (xấp xỉ - trong thực tế cần dùng thư viện chuyển đổi lịch)
+  const getTetDates = (year) => {
+    const tetDates = {
+      2024: ['2024-02-08', '2024-02-09', '2024-02-10', '2024-02-11', '2024-02-12', '2024-02-13', '2024-02-14'],
+      2025: ['2025-01-27', '2025-01-28', '2025-01-29', '2025-01-30', '2025-01-31', '2025-02-01', '2025-02-02'],
+      2026: ['2026-02-16', '2026-02-17', '2026-02-18', '2026-02-19', '2026-02-20', '2026-02-21', '2026-02-22'],
+      2027: ['2027-02-05', '2027-02-06', '2027-02-07', '2027-02-08', '2027-02-09', '2027-02-10', '2027-02-11'],
+      2028: ['2028-01-25', '2028-01-26', '2028-01-27', '2028-01-28', '2028-01-29', '2028-01-30', '2028-01-31'],
+    };
+    return tetDates[year] || [];
+  };
+
+  // Hàm tính ngày Giỗ tổ Hùng Vương (xấp xỉ)
+  const getHungKingDate = (year) => {
+    const hungKingDates = {
+      2024: '2024-04-18',
+      2025: '2025-04-07',
+      2026: '2026-04-26',
+      2027: '2027-04-16',
+      2028: '2028-04-04',
+    };
+    return hungKingDates[year];
+  };
 
   // Quick preset buttons data
   const presetPeriods = [
+    { label: '7 ngày', days: 7, months: 0, years: 0 },
+    { label: '10 ngày', days: 10, months: 0, years: 0 },
+    { label: '15 ngày', days: 15, months: 0, years: 0 },
+    { label: '20 ngày', days: 20, months: 0, years: 0 },
     { label: '30 ngày', days: 30, months: 0, years: 0 },
     { label: '45 ngày', days: 45, months: 0, years: 0 },
     { label: '60 ngày', days: 60, months: 0, years: 0 },
     { label: '90 ngày', days: 90, months: 0, years: 0 },
+    { label: '3 tháng', days: 0, months: 3, years: 0 },
     { label: '6 tháng', days: 0, months: 6, years: 0 },
+    { label: '9 tháng', days: 0, months: 9, years: 0 },
     { label: '1 năm', days: 0, months: 0, years: 1 },
     { label: '2 năm', days: 0, months: 0, years: 2 },
     { label: '3 năm', days: 0, months: 0, years: 3 },
+    { label: '5 năm', days: 0, months: 0, years: 5 },
+    { label: '10 năm', days: 0, months: 0, years: 10 },
   ];
 
   // Utility functions
@@ -83,8 +117,10 @@ const DateCalculator = () => {
   };
 
   const isHoliday = (date) => {
+    const year = date.getFullYear();
+    const holidays = getVietnamHolidays(year);
     const dateStr = date.toISOString().split('T')[0];
-    return vietnamHolidays.includes(dateStr);
+    return holidays.includes(dateStr);
   };
 
   const isWeekend = (date) => {
@@ -92,8 +128,32 @@ const DateCalculator = () => {
     return day === 0 || day === 6; // Sunday = 0, Saturday = 6
   };
 
-  const isWorkingDay = (date) => {
-    return !isWeekend(date) && !isHoliday(date);
+  const isWorkingDay = (date, excludeWeekends = true, excludeHolidays = true) => {
+    if (excludeWeekends && isWeekend(date)) return false;
+    if (excludeHolidays && isHoliday(date)) return false;
+    return true;
+  };
+
+  // Add working days to a date
+  const addWorkingDays = (startDate, daysToAdd, excludeWeekends, excludeHolidays) => {
+    if (!excludeWeekends && !excludeHolidays) {
+      // If not excluding anything, just add days normally
+      const result = new Date(startDate);
+      result.setDate(result.getDate() + daysToAdd);
+      return result;
+    }
+
+    let current = new Date(startDate);
+    let addedDays = 0;
+    
+    while (addedDays < daysToAdd) {
+      current.setDate(current.getDate() + 1);
+      if (isWorkingDay(current, excludeWeekends, excludeHolidays)) {
+        addedDays++;
+      }
+    }
+    
+    return current;
   };
 
   // Add time calculation
@@ -101,7 +161,7 @@ const DateCalculator = () => {
     if (!startDate) return;
     
     const start = new Date(startDate);
-    const result = new Date(start);
+    let result = new Date(start);
     
     // Add years first
     if (addYears) {
@@ -115,7 +175,12 @@ const DateCalculator = () => {
     
     // Add days
     if (addDays) {
-      result.setDate(result.getDate() + parseInt(addDays));
+      const daysToAdd = parseInt(addDays);
+      if (excludeWeekendsAdd || excludeHolidaysAdd) {
+        result = addWorkingDays(result, daysToAdd, excludeWeekendsAdd, excludeHolidaysAdd);
+      } else {
+        result.setDate(result.getDate() + daysToAdd);
+      }
     }
     
     setResultDate(result.toISOString().split('T')[0]);
@@ -135,12 +200,27 @@ const DateCalculator = () => {
       return;
     }
     
-    // Calculate total days
-    const timeDiff = end.getTime() - start.getTime();
-    const days = Math.ceil(timeDiff / (1000 * 3600 * 24));
-    setDaysDifference(days);
+    if (excludeWeekendsDiff || excludeHolidaysDiff) {
+      // Count working days
+      let current = new Date(start);
+      let workingDays = 0;
+      
+      while (current <= end) {
+        if (isWorkingDay(current, excludeWeekendsDiff, excludeHolidaysDiff)) {
+          workingDays++;
+        }
+        current.setDate(current.getDate() + 1);
+      }
+      
+      setDaysDifference(workingDays);
+    } else {
+      // Calculate total days
+      const timeDiff = end.getTime() - start.getTime();
+      const days = Math.ceil(timeDiff / (1000 * 3600 * 24));
+      setDaysDifference(days);
+    }
     
-    // Calculate years and months
+    // Calculate years and months (always calendar-based)
     let years = end.getFullYear() - start.getFullYear();
     let months = end.getMonth() - start.getMonth();
     
@@ -215,14 +295,48 @@ const DateCalculator = () => {
     setter(today);
   };
 
+  // Handle date input with continuous typing
+  const handleDateInput = (value, setter) => {
+    // Remove any non-digit characters
+    const cleanValue = value.replace(/\D/g, '');
+    
+    if (cleanValue.length <= 8) {
+      let formattedValue = cleanValue;
+      
+      // Add slashes automatically
+      if (cleanValue.length >= 3) {
+        formattedValue = cleanValue.slice(0, 2) + '/' + cleanValue.slice(2);
+      }
+      if (cleanValue.length >= 5) {
+        formattedValue = cleanValue.slice(0, 2) + '/' + cleanValue.slice(2, 4) + '/' + cleanValue.slice(4);
+      }
+      
+      setter(formattedValue);
+      
+      // Convert to ISO format when complete
+      if (cleanValue.length === 8) {
+        const day = cleanValue.slice(0, 2);
+        const month = cleanValue.slice(2, 4);
+        const year = cleanValue.slice(4, 8);
+        const isoDate = `${year}-${month}-${day}`;
+        
+        // Validate date
+        const date = new Date(isoDate);
+        if (date.getFullYear() == year && date.getMonth() + 1 == month && date.getDate() == day) {
+          setter(isoDate);
+        }
+      }
+    }
+  };
+
   // Effects
   useEffect(() => {
     calculateAddTime();
-  }, [startDate, addDays, addMonths, addYears]);
+  }, [startDate, addDays, addMonths, addYears, excludeWeekendsAdd, excludeHolidaysAdd]);
 
   useEffect(() => {
     calculateDateDifference();
-  }, [fromDate, toDate]);
+  }, [fromDate, toDate, excludeWeekendsDiff, excludeHolidaysDiff]);
 
   useEffect(() => {
     calculateWorkingDays();
@@ -244,12 +358,12 @@ const DateCalculator = () => {
             
             <div className="flex items-center gap-3">
               <Calendar className="w-10 h-10" />
-              <h1 className="text-3xl md:text-4xl font-bold">Tính Thời Hạn Giấy Tờ</h1>
+              <h1 className="text-3xl md:text-4xl font-bold">Công Cụ Tính Toán Thời Gian</h1>
             </div>
             
             <div className="w-20"></div> {/* Spacer for balance */}
           </div>
-          <p className="text-center text-blue-100 text-lg">Công cụ tính toán thời gian và thời hạn hiệu lực văn bản</p>
+          <p className="text-center text-blue-100 text-lg">Tính toán thời gian và thời hạn hiệu lực văn bản chính xác</p>
         </div>
 
         {/* Tabs */}
@@ -313,6 +427,8 @@ const DateCalculator = () => {
                             type="date"
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
+                            onInput={(e) => handleDateInput(e.target.value, setStartDate)}
+                            placeholder="dd/mm/yyyy"
                             className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                           />
                           <button
@@ -365,6 +481,34 @@ const DateCalculator = () => {
                           />
                         </div>
                       </div>
+
+                      {/* Exclude options */}
+                      <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="excludeWeekendsAdd"
+                            checked={excludeWeekendsAdd}
+                            onChange={(e) => setExcludeWeekendsAdd(e.target.checked)}
+                            className="w-5 h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <label htmlFor="excludeWeekendsAdd" className="ml-3 text-sm text-gray-700">
+                            Không tính thứ 7, chủ nhật
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="excludeHolidaysAdd"
+                            checked={excludeHolidaysAdd}
+                            onChange={(e) => setExcludeHolidaysAdd(e.target.checked)}
+                            className="w-5 h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <label htmlFor="excludeHolidaysAdd" className="ml-3 text-sm text-gray-700">
+                            Không tính ngày lễ
+                          </label>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -413,6 +557,14 @@ const DateCalculator = () => {
                               addDays && `${addDays} ngày`
                             ].filter(Boolean).join(', ') || 'Không có'}
                           </div>
+                          {(excludeWeekendsAdd || excludeHolidaysAdd) && (
+                            <div className="text-sm text-blue-100 mt-1">
+                              Loại trừ: {[
+                                excludeWeekendsAdd && 'T7, CN',
+                                excludeHolidaysAdd && 'Ngày lễ'
+                              ].filter(Boolean).join(', ')}
+                            </div>
+                          )}
                         </div>
 
                         <div className="bg-white/30 backdrop-blur rounded-lg p-5 border-2 border-white/50">
@@ -434,7 +586,7 @@ const DateCalculator = () => {
                       <div>• Tính thời hạn hiệu lực hộ chiếu (10 năm từ ngày cấp)</div>
                       <div>• Tính hạn nộp thuế (30 ngày từ ngày ký hợp đồng)</div>
                       <div>• Tính thời hạn khiếu nại (60 ngày từ ngày có quyết định)</div>
-                      <div>• Tính thời hạn bảo hành (2 năm từ ngày mua)</div>
+                      <div>• Tính thời hạn xử lý hồ sơ (15 ngày làm việc)</div>
                       <div>• Tính ngày hết hạn visa (90 ngày từ ngày nhập cảnh)</div>
                     </div>
                   </div>
@@ -493,6 +645,34 @@ const DateCalculator = () => {
                           </button>
                         </div>
                       </div>
+
+                      {/* Exclude options */}
+                      <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="excludeWeekendsDiff"
+                            checked={excludeWeekendsDiff}
+                            onChange={(e) => setExcludeWeekendsDiff(e.target.checked)}
+                            className="w-5 h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <label htmlFor="excludeWeekendsDiff" className="ml-3 text-sm text-gray-700">
+                            Không tính thứ 7, chủ nhật
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="excludeHolidaysDiff"
+                            checked={excludeHolidaysDiff}
+                            onChange={(e) => setExcludeHolidaysDiff(e.target.checked)}
+                            className="w-5 h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <label htmlFor="excludeHolidaysDiff" className="ml-3 text-sm text-gray-700">
+                            Không tính ngày lễ
+                          </label>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -522,11 +702,21 @@ const DateCalculator = () => {
                         <div className="bg-white/30 backdrop-blur rounded-lg p-5 border-2 border-white/50">
                           <div className="text-sm font-medium mb-2">Khoảng cách thời gian:</div>
                           <div className="space-y-2">
-                            <div className="text-2xl font-bold">{daysDifference} ngày</div>
+                            <div className="text-2xl font-bold">
+                              {daysDifference} {(excludeWeekendsDiff || excludeHolidaysDiff) ? 'ngày làm việc' : 'ngày'}
+                            </div>
                             {(yearsDifference > 0 || monthsDifference > 0) && (
                               <div className="text-lg text-blue-100">
                                 {yearsDifference > 0 && `${yearsDifference} năm `}
                                 {monthsDifference > 0 && `${monthsDifference} tháng`}
+                              </div>
+                            )}
+                            {(excludeWeekendsDiff || excludeHolidaysDiff) && (
+                              <div className="text-sm text-blue-100 mt-1">
+                                Loại trừ: {[
+                                  excludeWeekendsDiff && 'T7, CN',
+                                  excludeHolidaysDiff && 'Ngày lễ'
+                                ].filter(Boolean).join(', ')}
                               </div>
                             )}
                           </div>
@@ -545,7 +735,7 @@ const DateCalculator = () => {
                       <div>• Tính tuổi từ ngày sinh đến hiện tại</div>
                       <div>• Tính thời gian làm việc tại công ty</div>
                       <div>• Tính thời gian còn lại đến hạn nộp hồ sơ</div>
-                      <div>• Tính khoảng cách giữa hai sự kiện</div>
+                      <div>• Tính khoảng cách giữa hai sự kiện (chỉ ngày làm việc)</div>
                       <div>• Tính thời gian trễ hạn nộp thuế</div>
                     </div>
                   </div>
@@ -561,7 +751,7 @@ const DateCalculator = () => {
                   <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200">
                     <h2 className="text-xl font-bold text-blue-900 mb-6 flex items-center gap-2">
                       <Clock className="w-6 h-6" />
-                      Tính ngày làm việc (trừ T7, CN, lễ)
+                      Thống kê ngày làm việc chi tiết
                     </h2>
                     
                     <div className="space-y-4">
@@ -615,9 +805,9 @@ const DateCalculator = () => {
                     </h3>
                     <div className="text-sm text-amber-800 space-y-1">
                       <div>• Tết Dương lịch (01/01)</div>
-                      <div>• Tết Nguyên đán (7 ngày)</div>
+                      <div>• Tết Nguyên đán (7 ngày theo âm lịch)</div>
                       <div>• Giỗ tổ Hùng Vương (10/03 âm lịch)</div>
-                      <div>• Ngày Giải phóng (30/04)</div>
+                      <div>• Ngày Giải phóng miền Nam (30/04)</div>
                       <div>• Ngày Quốc tế Lao động (01/05)</div>
                       <div>• Ngày Quốc khánh (02/09)</div>
                     </div>
@@ -630,7 +820,7 @@ const DateCalculator = () => {
                     <div className="bg-gradient-to-br from-indigo-500 to-blue-600 p-6 rounded-xl text-white shadow-lg">
                       <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                         <Calendar className="w-6 h-6" />
-                        Kết quả tính toán
+                        Kết quả thống kê
                       </h2>
                       
                       <div className="space-y-4">
@@ -695,8 +885,8 @@ const DateCalculator = () => {
                       Ví dụ sử dụng:
                     </h3>
                     <div className="text-sm text-green-800 space-y-2">
-                      <div>• Tính thời hạn xử lý hồ sơ hành chính (15 ngày làm việc)</div>
-                      <div>• Tính thời gian nghỉ phép trong tháng</div>
+                      <div>• Thống kê ngày làm việc trong tháng/quý</div>
+                      <div>• Tính thời gian xử lý hồ sơ hành chính (15 ngày làm việc)</div>
                       <div>• Tính số ngày làm việc để hoàn thành dự án</div>
                       <div>• Tính thời hạn phúc thẩm (30 ngày làm việc)</div>
                       <div>• Tính thời gian xử lý khiếu nại (60 ngày làm việc)</div>
