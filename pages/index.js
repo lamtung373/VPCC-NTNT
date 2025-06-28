@@ -1,7 +1,10 @@
 import React from 'react';
+import { useRouter } from 'next/router';
 import { Calculator, FileText, Scale, ChevronRight } from 'lucide-react';
 
 const HomePage = () => {
+  const router = useRouter();
+  
   // Danh sách công cụ - có thể thêm công cụ mới vào đây
   const tools = [
     {
@@ -9,17 +12,13 @@ const HomePage = () => {
       title: 'Công cụ tính phí công chứng',
       description: 'Tính phí dịch thuật, công chứng, chứng thực nhanh chóng và chính xác',
       icon: Calculator,
-      path: '/components/UnifiedFeeCalculator'
+      path: '/fee-calculator'
     },
     // Có thể thêm công cụ khác ở đây trong tương lai
   ];
 
   const handleToolClick = (tool) => {
-    // Trong React app thực tế, bạn sẽ dùng React Router hoặc Next.js router
-    // Ở đây tôi sẽ alert để demo
-    alert(`Chuyển đến: ${tool.path}`);
-    // Trong Next.js: router.push(tool.path)
-    // Hoặc: window.location.href = tool.path
+    router.push(tool.path);
   };
 
   return (
