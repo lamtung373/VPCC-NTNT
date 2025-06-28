@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import { Calculator, FileText, Scale, ChevronRight } from 'lucide-react';
+import { Calculator, FileText, Scale, ChevronRight, Calendar, Clock } from 'lucide-react';
 
 const HomePage = () => {
   const router = useRouter();
@@ -13,6 +13,13 @@ const HomePage = () => {
       description: 'Tính phí dịch thuật, công chứng, chứng thực nhanh chóng và chính xác',
       icon: Calculator,
       path: '/fee-calculator'
+    },
+    {
+      id: 'date-calculator',
+      title: 'Tính thời hạn giấy tờ',
+      description: 'Tính toán thời hạn hiệu lực, ngày hết hạn và số ngày làm việc cho các loại giấy tờ',
+      icon: Calendar,
+      path: '/date-calculator'
     },
     // Có thể thêm công cụ khác ở đây trong tương lai
   ];
