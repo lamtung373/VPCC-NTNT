@@ -9,7 +9,7 @@ const HomePage = () => {
   const tools = [
     {
       id: 'fee-calculator',
-      title: 'Công cụ tính phí công chứng',
+      title: 'Tính phí công chứng',
       description: 'Tính phí dịch thuật, công chứng, chứng thực nhanh chóng và chính xác',
       icon: Calculator,
       path: '/fee-calculator'
