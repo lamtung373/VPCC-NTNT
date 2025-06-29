@@ -84,28 +84,39 @@ const HomePage = () => {
             })}
             
             {/* Contact for new tools */}
-            <div className="border-2 border-dashed border-blue-300 rounded-xl p-6 bg-gradient-to-br from-blue-50/80 to-indigo-50/80 hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 min-h-[140px] group">
-              <div className="text-center h-full flex flex-col justify-center">
-                <div className="bg-blue-100 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-200 transition-colors duration-300">
-                  <FileText className="w-6 h-6 text-blue-600" />
+            <div className="border-2 border-dashed border-blue-300 rounded-xl p-6 bg-gradient-to-br from-blue-50/80 to-indigo-50/80 hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 group">
+              <div className="flex items-start gap-4">
+                {/* Icon */}
+                <div className="bg-blue-100 rounded-lg p-3 group-hover:bg-blue-200 transition-colors duration-300">
+                  <FileText className="w-8 h-8 text-blue-600" />
                 </div>
-                <h3 className="text-lg font-bold text-blue-800 mb-2">
-                  Đề xuất công cụ mới
-                </h3>
-                <p className="text-sm text-blue-600 mb-3 leading-relaxed">
-                  Bạn cần công cụ hỗ trợ khác?<br />
-                  Chúng tôi sẵn sàng phát triển theo yêu cầu
-                </p>
-                <div className="bg-white/70 backdrop-blur rounded-lg p-3 border border-blue-200">
-                  <p className="text-xs font-medium text-blue-700 mb-1">
-                    Liên hệ phát triển:
+                
+                {/* Content */}
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-blue-800 mb-2">
+                    Đề xuất công cụ mới
+                  </h3>
+                  <p className="text-blue-600 text-sm mb-3 leading-relaxed">
+                    Bạn cần công cụ hỗ trợ khác? Chúng tôi sẵn sàng phát triển theo yêu cầu.
                   </p>
-                  <p className="text-sm font-bold text-blue-800">
-                    Lâm Tùng - 0941.108.117
-                  </p>
-                  <p className="text-xs text-blue-600 mt-1">
-                    (Zalo/Điện thoại)
-                  </p>
+                  
+                  <div className="flex items-center gap-4 text-sm">
+                    <div className="text-blue-700 font-medium">Liên hệ: Lâm Tùng</div>
+                    <a 
+                      href="tel:0941108117"
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg transition-colors font-medium"
+                    >
+                      0941108117
+                    </a>
+                    <a 
+                      href="https://zalo.me/0941108117"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg transition-colors font-medium"
+                    >
+                      Zalo
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
