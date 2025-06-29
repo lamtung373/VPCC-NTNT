@@ -2,273 +2,12 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Calendar, Clock, Plus, Minus, Calculator, ChevronRight, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/router';
 
-// Constants
-const TABS = {
-  ADD_TIME: 'add-time',
-  DATE_DIFF: 'date-diff',
-  WORKING_DAYS: 'working-days'
-};
-
-const PRESET_PERIODS = [
-  { label: '7 ngày', days: 7, months: 0, years: 0 },
-  { label: '10 ngày', days: 10, months: 0, years: 0 },
-  { label: '15 ngày', days: 15, months: 0, years: 0 },
-  { label: '20 ngày', days: 20, months: 0, years: 0 },
-  { label: '30 ngày', days: 30, months: 0, years: 0 },
-  { label: '45 ngày', days: 45, months: 0, years: 0 },
-  { label: '60 ngày', days: 60, months: 0, years: 0 },
-  { label: '90 ngày', days: 90, months: 0, years: 0 },
-  { label: '3 tháng', days: 0, months: 3, years: 0 },
-  { label: '6 tháng', days: 0, months: 6, years: 0 },
-  { label: '9 tháng', days: 0, months: 9, years: 0 },
-  { label: '1 năm', days: 0, months: 0, years: 1 },
-  { label: '2 năm', days: 0, months: 0, years: 2 },
-  { label: '3 năm', days: 0, months: 0, years: 3 },
-  { label: '5 năm', days: 0, months: 0, years: 5 },
-  { label: '10 năm', days: 0, months: 0, years: 10 },
-];
-
-// Holiday data
-const TET_DATES = {
-  2024: ['2024-02-08', '2024-02-09', '2024-02-10', '2024-02-11', '2024-02-12', '2024-02-13', '2024-02-14'],
-  2025: ['2025-01-27', '2025-01-28', '2025-01-29', '2025-01-30', '2025-01-31', '2025-02-01', '2025-02-02'],
-  2026: ['2026-02-16', '2026-02-17', '2026-02-18', '2026-02-19', '2026-02-20', '2026-02-21', '2026-02-22'],
-  2027: ['2027-02-05', '2027-02-06', '2027-02-07', '2027-02-08', '2027-02-09', '2027-02-10', '2027-02-11'],
-  2028: ['2028-01-25', '2028-01-26', '2028-01-27', '2028-01-28', '2028-01-29', '2028-01-30', '2028-01-31'],
-};
-
-const HUNG_KING_DATES = {
-  2024: '2024-04-18',
-  2025: '2025-04-07',
-  2026: '2026-04-26',
-  2027: '2027-04-16',
-  2028: '2028-04-04',
-};
-
-// Custom hook for date input
-const useDateInput = (initialValue = '') => {
-  const [value, setValue] = useState(initialValue);
-  const [displayValue, setDisplayValue] = useState('');
-
-  const handleInput = useCallback((e) => {
-    const input = e.target.value;
-    const cleanValue = input.replace(/\D/g, '');
-    
-    if (cleanValue.length <= 8) {
-      let formatted = cleanValue;
-      
-      // Auto-format while typing
-      if (cleanValue.length >= 2) {
-        formatted = cleanValue.slice(0, 2) + (cleanValue.length > 2 ? '/' : '');
-        if (cleanValue.length >= 4) {
-          formatted += cleanValue.slice(2, 4) + (cleanValue.length > 4 ? '/' : '');
-          if (cleanValue.length > 4) {
-            formatted += cleanValue.slice(4, 8);
-          }
-        } else if (cleanValue.length > 2) {
-          formatted += cleanValue.slice(2);
-        }
-      }
-      
-      setDisplayValue(formatted);
-      
-      // Convert to ISO format when complete
-      if (cleanValue.length === 8) {
-        const day = cleanValue.slice(0, 2);
-        const month = cleanValue.slice(2, 4);
-        const year = cleanValue.slice(4, 8);
-        const isoDate = `${year}-${month}-${day}`;
-        
-        // Validate date
-        const date = new Date(isoDate);
-        if (date.getFullYear() == year && date.getMonth() + 1 == month && date.getDate() == day) {
-          setValue(isoDate);
-          setDisplayValue(formatted);
-        }
-      } else {
-        setValue('');
-      }
-    }
-  }, []);
-
-  const setToday = useCallback(() => {
-    const today = new Date();
-    const isoDate = today.toISOString().split('T')[0];
-    setValue(isoDate);
-    const day = String(today.getDate()).padStart(2, '0');
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const year = today.getFullYear();
-    setDisplayValue(`${day}/${month}/${year}`);
-  }, []);
-
-  const reset = useCallback(() => {
-    setValue('');
-    setDisplayValue('');
-  }, []);
-
-  // Sync display value when value changes externally
-  useEffect(() => {
-    if (value && value.includes('-')) {
-      const [year, month, day] = value.split('-');
-      setDisplayValue(`${day}/${month}/${year}`);
-    }
-  }, [value]);
-
-  return { value, displayValue, handleInput, setToday, reset, setValue };
-};
-
-// Utility functions
-const formatDate = (date) => {
-  if (!date) return '';
-  const d = new Date(date);
-  return new Intl.DateTimeFormat('vi-VN', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }).format(d);
-};
-
-const formatShortDate = (date) => {
-  if (!date) return '';
-  const d = new Date(date);
-  return new Intl.DateTimeFormat('vi-VN').format(d);
-};
-
-const getVietnamHolidays = (year) => {
-  const holidays = [
-    `${year}-01-01`, // Tết Dương lịch
-    `${year}-04-30`, // Giải phóng miền Nam
-    `${year}-05-01`, // Quốc tế Lao động
-    `${year}-09-02`, // Quốc khánh
-  ];
-  
-  // Add Tet holidays
-  if (TET_DATES[year]) {
-    holidays.push(...TET_DATES[year]);
-  }
-  
-  // Add Hung King date
-  if (HUNG_KING_DATES[year]) {
-    holidays.push(HUNG_KING_DATES[year]);
-  }
-  
-  return holidays;
-};
-
-const isHoliday = (date) => {
-  const holidays = getVietnamHolidays(date.getFullYear());
-  const dateStr = date.toISOString().split('T')[0];
-  return holidays.includes(dateStr);
-};
-
-const isWeekend = (date) => {
-  const day = date.getDay();
-  return day === 0 || day === 6;
-};
-
-const isWorkingDay = (date, excludeWeekends = true, excludeHolidays = true) => {
-  if (excludeWeekends && isWeekend(date)) return false;
-  if (excludeHolidays && isHoliday(date)) return false;
-  return true;
-};
-
-const addWorkingDays = (startDate, daysToAdd, excludeWeekends, excludeHolidays) => {
-  if (!excludeWeekends && !excludeHolidays) {
-    const result = new Date(startDate);
-    result.setDate(result.getDate() + daysToAdd);
-    return result;
-  }
-
-  let current = new Date(startDate);
-  let addedDays = 0;
-  
-  while (addedDays < daysToAdd) {
-    current.setDate(current.getDate() + 1);
-    if (isWorkingDay(current, excludeWeekends, excludeHolidays)) {
-      addedDays++;
-    }
-  }
-  
-  return current;
-};
-
-// Components
-const DateInput = ({ label, value, displayValue, onChange, onToday, placeholder = "dd/mm/yyyy" }) => (
-  <div>
-    <label className="block text-sm font-semibold text-gray-700 mb-2">
-      {label}
-    </label>
-    <div className="flex gap-2">
-      <input
-        type="text"
-        value={displayValue}
-        onChange={onChange}
-        placeholder={placeholder}
-        className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-        maxLength="10"
-      />
-      <button
-        onClick={onToday}
-        className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
-      >
-        Hôm nay
-      </button>
-    </div>
-  </div>
-);
-
-const NumberInput = ({ label, value, onChange, placeholder = "0" }) => (
-  <div>
-    <label className="block text-sm font-semibold text-gray-700 mb-2">
-      {label}
-    </label>
-    <input
-      type="number"
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-      min="0"
-      className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-    />
-  </div>
-);
-
-const CheckboxOption = ({ id, label, checked, onChange }) => (
-  <div className="flex items-center">
-    <input
-      type="checkbox"
-      id={id}
-      checked={checked}
-      onChange={onChange}
-      className="w-5 h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500"
-    />
-    <label htmlFor={id} className="ml-3 text-sm text-gray-700">
-      {label}
-    </label>
-  </div>
-);
-
-const TabButton = ({ active, onClick, icon: Icon, label }) => (
-  <button
-    onClick={onClick}
-    className={`flex items-center justify-center gap-2 py-4 px-4 font-semibold transition-all text-sm md:text-base ${
-      active
-        ? 'bg-blue-50 text-blue-700 border-b-3 border-blue-600'
-        : 'text-gray-600 hover:bg-gray-50'
-    }`}
-  >
-    <Icon className="w-5 h-5" />
-    {label}
-  </button>
-);
-
 const DateCalculator = () => {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState(TABS.ADD_TIME);
+  const [activeTab, setActiveTab] = useState('add-time');
   
   // Add Time states
-  const startDate = useDateInput();
+  const [startDate, setStartDate] = useState('');
   const [addDays, setAddDays] = useState('');
   const [addMonths, setAddMonths] = useState('');
   const [addYears, setAddYears] = useState('');
@@ -277,8 +16,8 @@ const DateCalculator = () => {
   const [excludeHolidaysAdd, setExcludeHolidaysAdd] = useState(false);
   
   // Date Difference states
-  const fromDate = useDateInput();
-  const toDate = useDateInput();
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
   const [daysDifference, setDaysDifference] = useState(0);
   const [monthsDifference, setMonthsDifference] = useState(0);
   const [yearsDifference, setYearsDifference] = useState(0);
@@ -286,28 +25,205 @@ const DateCalculator = () => {
   const [excludeHolidaysDiff, setExcludeHolidaysDiff] = useState(false);
   
   // Working Days states
-  const workFromDate = useDateInput();
-  const workToDate = useDateInput();
+  const [workFromDate, setWorkFromDate] = useState('');
+  const [workToDate, setWorkToDate] = useState('');
   const [workingDays, setWorkingDays] = useState(0);
   const [totalDays, setTotalDays] = useState(0);
   const [weekendDays, setWeekendDays] = useState(0);
   const [holidayDays, setHolidayDays] = useState(0);
 
-  // Memoized calculations
-  const calculateAddTime = useCallback(() => {
-    if (!startDate.value) return;
+  // Input display states for formatted date inputs
+  const [startDateDisplay, setStartDateDisplay] = useState('');
+  const [fromDateDisplay, setFromDateDisplay] = useState('');
+  const [toDateDisplay, setToDateDisplay] = useState('');
+  const [workFromDateDisplay, setWorkFromDateDisplay] = useState('');
+  const [workToDateDisplay, setWorkToDateDisplay] = useState('');
+
+  // Memoized holiday data
+  const vietnamHolidays = useMemo(() => ({
+    tetDates: {
+      2024: ['2024-02-08', '2024-02-09', '2024-02-10', '2024-02-11', '2024-02-12', '2024-02-13', '2024-02-14'],
+      2025: ['2025-01-27', '2025-01-28', '2025-01-29', '2025-01-30', '2025-01-31', '2025-02-01', '2025-02-02'],
+      2026: ['2026-02-16', '2026-02-17', '2026-02-18', '2026-02-19', '2026-02-20', '2026-02-21', '2026-02-22'],
+      2027: ['2027-02-05', '2027-02-06', '2027-02-07', '2027-02-08', '2027-02-09', '2027-02-10', '2027-02-11'],
+      2028: ['2028-01-25', '2028-01-26', '2028-01-27', '2028-01-28', '2028-01-29', '2028-01-30', '2028-01-31'],
+    },
+    hungKingDates: {
+      2024: '2024-04-18',
+      2025: '2025-04-07',
+      2026: '2026-04-26',
+      2027: '2027-04-16',
+      2028: '2028-04-04',
+    }
+  }), []);
+
+  // Quick preset buttons data
+  const presetPeriods = useMemo(() => [
+    { label: '7 ngày', days: 7, months: 0, years: 0 },
+    { label: '10 ngày', days: 10, months: 0, years: 0 },
+    { label: '15 ngày', days: 15, months: 0, years: 0 },
+    { label: '20 ngày', days: 20, months: 0, years: 0 },
+    { label: '30 ngày', days: 30, months: 0, years: 0 },
+    { label: '45 ngày', days: 45, months: 0, years: 0 },
+    { label: '60 ngày', days: 60, months: 0, years: 0 },
+    { label: '90 ngày', days: 90, months: 0, years: 0 },
+    { label: '3 tháng', days: 0, months: 3, years: 0 },
+    { label: '6 tháng', days: 0, months: 6, years: 0 },
+    { label: '9 tháng', days: 0, months: 9, years: 0 },
+    { label: '1 năm', days: 0, months: 0, years: 1 },
+    { label: '2 năm', days: 0, months: 0, years: 2 },
+    { label: '3 năm', days: 0, months: 0, years: 3 },
+    { label: '5 năm', days: 0, months: 0, years: 5 },
+    { label: '10 năm', days: 0, months: 0, years: 10 },
+  ], []);
+
+  // Utility functions
+  const formatDate = useCallback((date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    return new Intl.DateTimeFormat('vi-VN', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }).format(d);
+  }, []);
+
+  const formatShortDate = useCallback((date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    return new Intl.DateTimeFormat('vi-VN').format(d);
+  }, []);
+
+  // Get Vietnam holidays for a specific year
+  const getVietnamHolidays = useCallback((year) => {
+    const holidays = [];
     
-    const start = new Date(startDate.value);
+    // Fixed holidays
+    holidays.push(`${year}-01-01`); // Tết Dương lịch
+    holidays.push(`${year}-04-30`); // Ngày Giải phóng miền Nam
+    holidays.push(`${year}-05-01`); // Ngày Quốc tế Lao động
+    holidays.push(`${year}-09-02`); // Ngày Quốc khánh
+    
+    // Tet dates
+    const tetDates = vietnamHolidays.tetDates[year] || [];
+    holidays.push(...tetDates);
+    
+    // Hung King date
+    const hungKingDate = vietnamHolidays.hungKingDates[year];
+    if (hungKingDate) holidays.push(hungKingDate);
+    
+    return holidays;
+  }, [vietnamHolidays]);
+
+  const isHoliday = useCallback((date) => {
+    const year = date.getFullYear();
+    const holidays = getVietnamHolidays(year);
+    const dateStr = date.toISOString().split('T')[0];
+    return holidays.includes(dateStr);
+  }, [getVietnamHolidays]);
+
+  const isWeekend = useCallback((date) => {
+    const day = date.getDay();
+    return day === 0 || day === 6; // Sunday = 0, Saturday = 6
+  }, []);
+
+  const isWorkingDay = useCallback((date, excludeWeekends = true, excludeHolidays = true) => {
+    if (excludeWeekends && isWeekend(date)) return false;
+    if (excludeHolidays && isHoliday(date)) return false;
+    return true;
+  }, [isWeekend, isHoliday]);
+
+  // Enhanced date input handler with auto-formatting
+  const handleDateInput = useCallback((value, setter, displaySetter) => {
+    // Remove any non-digit characters
+    const cleanValue = value.replace(/\D/g, '');
+    
+    if (cleanValue.length <= 8) {
+      let formattedDisplay = cleanValue;
+      
+      // Add slashes automatically for display
+      if (cleanValue.length >= 3) {
+        formattedDisplay = cleanValue.slice(0, 2) + '/' + cleanValue.slice(2);
+      }
+      if (cleanValue.length >= 5) {
+        formattedDisplay = cleanValue.slice(0, 2) + '/' + cleanValue.slice(2, 4) + '/' + cleanValue.slice(4);
+      }
+      
+      // Update display value
+      displaySetter(formattedDisplay);
+      
+      // Convert to ISO format when complete (8 digits)
+      if (cleanValue.length === 8) {
+        const day = cleanValue.slice(0, 2);
+        const month = cleanValue.slice(2, 4);
+        const year = cleanValue.slice(4, 8);
+        const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        
+        // Validate date
+        const date = new Date(isoDate);
+        if (date.getFullYear() == year && 
+            date.getMonth() + 1 == month && 
+            date.getDate() == day) {
+          setter(isoDate);
+        }
+      } else if (cleanValue.length === 0) {
+        setter('');
+      }
+    }
+  }, []);
+
+  // Handle regular date input (from date picker)
+  const handleDatePickerInput = useCallback((value, setter, displaySetter) => {
+    setter(value);
+    if (value) {
+      const date = new Date(value);
+      const formattedDisplay = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+      displaySetter(formattedDisplay);
+    } else {
+      displaySetter('');
+    }
+  }, []);
+
+  // Add working days to a date
+  const addWorkingDays = useCallback((startDate, daysToAdd, excludeWeekends, excludeHolidays) => {
+    if (!excludeWeekends && !excludeHolidays) {
+      const result = new Date(startDate);
+      result.setDate(result.getDate() + daysToAdd);
+      return result;
+    }
+
+    let current = new Date(startDate);
+    let addedDays = 0;
+    
+    while (addedDays < daysToAdd) {
+      current.setDate(current.getDate() + 1);
+      if (isWorkingDay(current, excludeWeekends, excludeHolidays)) {
+        addedDays++;
+      }
+    }
+    
+    return current;
+  }, [isWorkingDay]);
+
+  // Add time calculation
+  const calculateAddTime = useCallback(() => {
+    if (!startDate) return;
+    
+    const start = new Date(startDate);
     let result = new Date(start);
     
+    // Add years first
     if (addYears) {
       result.setFullYear(result.getFullYear() + parseInt(addYears));
     }
     
+    // Add months
     if (addMonths) {
       result.setMonth(result.getMonth() + parseInt(addMonths));
     }
     
+    // Add days
     if (addDays) {
       const daysToAdd = parseInt(addDays);
       if (excludeWeekendsAdd || excludeHolidaysAdd) {
@@ -318,13 +234,14 @@ const DateCalculator = () => {
     }
     
     setResultDate(result.toISOString().split('T')[0]);
-  }, [startDate.value, addDays, addMonths, addYears, excludeWeekendsAdd, excludeHolidaysAdd]);
+  }, [startDate, addDays, addMonths, addYears, excludeWeekendsAdd, excludeHolidaysAdd, addWorkingDays]);
 
+  // Date difference calculation
   const calculateDateDifference = useCallback(() => {
-    if (!fromDate.value || !toDate.value) return;
+    if (!fromDate || !toDate) return;
     
-    const start = new Date(fromDate.value);
-    const end = new Date(toDate.value);
+    const start = new Date(fromDate);
+    const end = new Date(toDate);
     
     if (end < start) {
       setDaysDifference(0);
@@ -334,23 +251,26 @@ const DateCalculator = () => {
     }
     
     if (excludeWeekendsDiff || excludeHolidaysDiff) {
+      // Count working days
       let current = new Date(start);
-      let workingDays = 0;
+      let workingDaysCount = 0;
       
       while (current <= end) {
         if (isWorkingDay(current, excludeWeekendsDiff, excludeHolidaysDiff)) {
-          workingDays++;
+          workingDaysCount++;
         }
         current.setDate(current.getDate() + 1);
       }
       
-      setDaysDifference(workingDays);
+      setDaysDifference(workingDaysCount);
     } else {
+      // Calculate total days
       const timeDiff = end.getTime() - start.getTime();
       const days = Math.ceil(timeDiff / (1000 * 3600 * 24));
       setDaysDifference(days);
     }
     
+    // Calculate years and months (always calendar-based)
     let years = end.getFullYear() - start.getFullYear();
     let months = end.getMonth() - start.getMonth();
     
@@ -369,13 +289,14 @@ const DateCalculator = () => {
     
     setYearsDifference(years);
     setMonthsDifference(months);
-  }, [fromDate.value, toDate.value, excludeWeekendsDiff, excludeHolidaysDiff]);
+  }, [fromDate, toDate, excludeWeekendsDiff, excludeHolidaysDiff, isWorkingDay]);
 
+  // Working days calculation
   const calculateWorkingDays = useCallback(() => {
-    if (!workFromDate.value || !workToDate.value) return;
+    if (!workFromDate || !workToDate) return;
     
-    const start = new Date(workFromDate.value);
-    const end = new Date(workToDate.value);
+    const start = new Date(workFromDate);
+    const end = new Date(workToDate);
     
     if (end < start) {
       setWorkingDays(0);
@@ -409,7 +330,24 @@ const DateCalculator = () => {
     setTotalDays(total);
     setWeekendDays(weekends);
     setHolidayDays(holidays);
-  }, [workFromDate.value, workToDate.value]);
+  }, [workFromDate, workToDate, isHoliday, isWeekend]);
+
+  // Quick preset handler
+  const applyPreset = useCallback((preset) => {
+    setAddDays(preset.days.toString());
+    setAddMonths(preset.months.toString());
+    setAddYears(preset.years.toString());
+  }, []);
+
+  // Set today as default
+  const setToday = useCallback((setter, displaySetter) => {
+    const today = new Date();
+    const isoDate = today.toISOString().split('T')[0];
+    const displayDate = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
+    
+    setter(isoDate);
+    displaySetter(displayDate);
+  }, []);
 
   // Effects
   useEffect(() => {
@@ -424,12 +362,50 @@ const DateCalculator = () => {
     calculateWorkingDays();
   }, [calculateWorkingDays]);
 
-  // Handlers
-  const applyPreset = useCallback((preset) => {
-    setAddDays(preset.days.toString());
-    setAddMonths(preset.months.toString());
-    setAddYears(preset.years.toString());
-  }, []);
+  // Enhanced DateInput component
+  const DateInput = ({ 
+    value, 
+    displayValue, 
+    onChange, 
+    onDisplayChange, 
+    placeholder = "dd/mm/yyyy",
+    label,
+    showTodayButton = true 
+  }) => (
+    <div>
+      <label className="block text-sm font-semibold text-gray-700 mb-2">
+        {label}
+      </label>
+      <div className="flex gap-2">
+        <div className="flex-1 relative">
+          <input
+            type="text"
+            value={displayValue}
+            onChange={(e) => handleDateInput(e.target.value, onChange, onDisplayChange)}
+            placeholder={placeholder}
+            maxLength={10}
+            className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+          />
+          {/* Hidden date input for browser date picker */}
+          <input
+            type="date"
+            value={value}
+            onChange={(e) => handleDatePickerInput(e.target.value, onChange, onDisplayChange)}
+            className="absolute inset-0 opacity-0 cursor-pointer"
+            style={{ zIndex: 1 }}
+          />
+        </div>
+        {showTodayButton && (
+          <button
+            onClick={() => setToday(onChange, onDisplayChange)}
+            className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+          >
+            Hôm nay
+          </button>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
@@ -458,31 +434,47 @@ const DateCalculator = () => {
         {/* Tabs */}
         <div className="bg-white shadow-xl rounded-b-2xl">
           <div className="flex flex-col md:flex-row border-b border-gray-200">
-            <TabButton
-              active={activeTab === TABS.ADD_TIME}
-              onClick={() => setActiveTab(TABS.ADD_TIME)}
-              icon={Plus}
-              label="Cộng Thời Gian"
-            />
-            <TabButton
-              active={activeTab === TABS.DATE_DIFF}
-              onClick={() => setActiveTab(TABS.DATE_DIFF)}
-              icon={Minus}
-              label="Tính Khoảng Cách"
-            />
-            <TabButton
-              active={activeTab === TABS.WORKING_DAYS}
-              onClick={() => setActiveTab(TABS.WORKING_DAYS)}
-              icon={Clock}
-              label="Ngày Làm Việc"
-            />
+            <button
+              onClick={() => setActiveTab('add-time')}
+              className={`flex items-center justify-center gap-2 py-4 px-4 font-semibold transition-all text-sm md:text-base ${
+                activeTab === 'add-time'
+                  ? 'bg-blue-50 text-blue-700 border-b-3 border-blue-600'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              <Plus className="w-5 h-5" />
+              Cộng Thời Gian
+            </button>
+            <button
+              onClick={() => setActiveTab('date-diff')}
+              className={`flex items-center justify-center gap-2 py-4 px-4 font-semibold transition-all text-sm md:text-base ${
+                activeTab === 'date-diff'
+                  ? 'bg-blue-50 text-blue-700 border-b-3 border-blue-600'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              <Minus className="w-5 h-5" />
+              Tính Khoảng Cách
+            </button>
+            <button
+              onClick={() => setActiveTab('working-days')}
+              className={`flex items-center justify-center gap-2 py-4 px-4 font-semibold transition-all text-sm md:text-base ${
+                activeTab === 'working-days'
+                  ? 'bg-blue-50 text-blue-700 border-b-3 border-blue-600'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              <Clock className="w-5 h-5" />
+              Ngày Làm Việc
+            </button>
           </div>
 
           {/* Tab Content */}
           <div className="p-6 md:p-8">
             {/* Add Time Tab */}
-            {activeTab === TABS.ADD_TIME && (
+            {activeTab === 'add-time' && (
               <div className="grid md:grid-cols-2 gap-8">
+                {/* Input Form */}
                 <div className="space-y-6">
                   <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200">
                     <h2 className="text-xl font-bold text-blue-900 mb-6 flex items-center gap-2">
@@ -492,55 +484,93 @@ const DateCalculator = () => {
                     
                     <div className="space-y-4">
                       <DateInput
+                        value={startDate}
+                        displayValue={startDateDisplay}
+                        onChange={setStartDate}
+                        onDisplayChange={setStartDateDisplay}
                         label="Ngày bắt đầu"
-                        value={startDate.value}
-                        displayValue={startDate.displayValue}
-                        onChange={startDate.handleInput}
-                        onToday={startDate.setToday}
                       />
 
                       <div className="grid grid-cols-3 gap-3">
-                        <NumberInput
-                          label="Thêm ngày"
-                          value={addDays}
-                          onChange={(e) => setAddDays(e.target.value)}
-                        />
-                        <NumberInput
-                          label="Thêm tháng"
-                          value={addMonths}
-                          onChange={(e) => setAddMonths(e.target.value)}
-                        />
-                        <NumberInput
-                          label="Thêm năm"
-                          value={addYears}
-                          onChange={(e) => setAddYears(e.target.value)}
-                        />
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Thêm ngày
+                          </label>
+                          <input
+                            type="number"
+                            value={addDays}
+                            onChange={(e) => setAddDays(e.target.value)}
+                            placeholder="0"
+                            min="0"
+                            className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Thêm tháng
+                          </label>
+                          <input
+                            type="number"
+                            value={addMonths}
+                            onChange={(e) => setAddMonths(e.target.value)}
+                            placeholder="0"
+                            min="0"
+                            className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Thêm năm
+                          </label>
+                          <input
+                            type="number"
+                            value={addYears}
+                            onChange={(e) => setAddYears(e.target.value)}
+                            placeholder="0"
+                            min="0"
+                            className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          />
+                        </div>
                       </div>
 
+                      {/* Exclude options */}
                       <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
-                        <CheckboxOption
-                          id="excludeWeekendsAdd"
-                          label="Không tính thứ 7, chủ nhật"
-                          checked={excludeWeekendsAdd}
-                          onChange={(e) => setExcludeWeekendsAdd(e.target.checked)}
-                        />
-                        <CheckboxOption
-                          id="excludeHolidaysAdd"
-                          label="Không tính ngày lễ"
-                          checked={excludeHolidaysAdd}
-                          onChange={(e) => setExcludeHolidaysAdd(e.target.checked)}
-                        />
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="excludeWeekendsAdd"
+                            checked={excludeWeekendsAdd}
+                            onChange={(e) => setExcludeWeekendsAdd(e.target.checked)}
+                            className="w-5 h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <label htmlFor="excludeWeekendsAdd" className="ml-3 text-sm text-gray-700">
+                            Không tính thứ 7, chủ nhật
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="excludeHolidaysAdd"
+                            checked={excludeHolidaysAdd}
+                            onChange={(e) => setExcludeHolidaysAdd(e.target.checked)}
+                            className="w-5 h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <label htmlFor="excludeHolidaysAdd" className="ml-3 text-sm text-gray-700">
+                            Không tính ngày lễ
+                          </label>
+                        </div>
                       </div>
                     </div>
                   </div>
 
+                  {/* Quick Presets */}
                   <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-5">
                     <h3 className="font-bold text-green-900 mb-3 flex items-center gap-2">
                       <Calculator className="w-5 h-5" />
                       Mốc thời gian thông dụng:
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {PRESET_PERIODS.map((preset, index) => (
+                      {presetPeriods.map((preset, index) => (
                         <button
                           key={index}
                           onClick={() => applyPreset(preset)}
@@ -553,8 +583,130 @@ const DateCalculator = () => {
                   </div>
                 </div>
 
+                {/* Results */}
                 <div className="space-y-6">
-                  {startDate.value && resultDate && (
+                  {startDate && resultDate && (
+                    <div className="bg-gradient-to-br from-indigo-500 to-blue-600 p-6 rounded-xl text-white shadow-lg">
+                      <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                        <Calendar className="w-6 h-6" />
+                        Kết quả tính toán
+                      </h2>
+                      
+                      <div className="space-y-4">
+                        <div className="bg-white/20 backdrop-blur rounded-lg p-4">
+                          <div className="text-sm font-medium mb-1">Ngày bắt đầu:</div>
+                          <div className="text-lg font-bold">{formatDate(startDate)}</div>
+                          <div className="text-sm text-blue-100">{formatShortDate(startDate)}</div>
+                        </div>
+
+                        <div className="bg-white/20 backdrop-blur rounded-lg p-4">
+                          <div className="text-sm font-medium mb-1">Thời gian cộng thêm:</div>
+                          <div className="text-lg font-bold">
+                            {[
+                              addYears && `${addYears} năm`,
+                              addMonths && `${addMonths} tháng`, 
+                              addDays && `${addDays} ngày`
+                            ].filter(Boolean).join(', ') || 'Không có'}
+                          </div>
+                          {(excludeWeekendsAdd || excludeHolidaysAdd) && (
+                            <div className="text-sm text-blue-100 mt-1">
+                              Loại trừ: {[
+                                excludeWeekendsAdd && 'T7, CN',
+                                excludeHolidaysAdd && 'Ngày lễ'
+                              ].filter(Boolean).join(', ')}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="bg-white/30 backdrop-blur rounded-lg p-5 border-2 border-white/50">
+                          <div className="text-sm font-medium mb-1">Ngày kết quả:</div>
+                          <div className="text-2xl font-bold">{formatDate(resultDate)}</div>
+                          <div className="text-lg text-blue-100 mt-1">{formatShortDate(resultDate)}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Examples */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
+                    <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2">
+                      <ChevronRight className="w-5 h-5" />
+                      Ví dụ sử dụng:
+                    </h3>
+                    <div className="text-sm text-blue-800 space-y-2">
+                      <div>• Tính thời hạn hiệu lực hộ chiếu (10 năm từ ngày cấp)</div>
+                      <div>• Tính hạn nộp thuế (30 ngày từ ngày ký hợp đồng)</div>
+                      <div>• Tính thời hạn khiếu nại (60 ngày từ ngày có quyết định)</div>
+                      <div>• Tính thời hạn xử lý hồ sơ (15 ngày làm việc)</div>
+                      <div>• Tính ngày hết hạn visa (90 ngày từ ngày nhập cảnh)</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Date Difference Tab */}
+            {activeTab === 'date-diff' && (
+              <div className="grid md:grid-cols-2 gap-8">
+                {/* Input Form */}
+                <div className="space-y-6">
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200">
+                    <h2 className="text-xl font-bold text-blue-900 mb-6 flex items-center gap-2">
+                      <Minus className="w-6 h-6" />
+                      Tính khoảng cách giữa hai mốc thời gian
+                    </h2>
+                    
+                    <div className="space-y-4">
+                      <DateInput
+                        value={fromDate}
+                        displayValue={fromDateDisplay}
+                        onChange={setFromDate}
+                        onDisplayChange={setFromDateDisplay}
+                        label="Từ ngày"
+                      />
+
+                      <DateInput
+                        value={toDate}
+                        displayValue={toDateDisplay}
+                        onChange={setToDate}
+                        onDisplayChange={setToDateDisplay}
+                        label="Đến ngày"
+                      />
+
+                      {/* Exclude options */}
+                      <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="excludeWeekendsDiff"
+                            checked={excludeWeekendsDiff}
+                            onChange={(e) => setExcludeWeekendsDiff(e.target.checked)}
+                            className="w-5 h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <label htmlFor="excludeWeekendsDiff" className="ml-3 text-sm text-gray-700">
+                            Không tính thứ 7, chủ nhật
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="excludeHolidaysDiff"
+                            checked={excludeHolidaysDiff}
+                            onChange={(e) => setExcludeHolidaysDiff(e.target.checked)}
+                            className="w-5 h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <label htmlFor="excludeHolidaysDiff" className="ml-3 text-sm text-gray-700">
+                            Không tính ngày lễ
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Results */}
+                <div className="space-y-6">
+                  {fromDate && toDate && (
                     <div className="bg-gradient-to-br from-indigo-500 to-blue-600 p-6 rounded-xl text-white shadow-lg">
                       <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                         <Calendar className="w-6 h-6" />
@@ -564,14 +716,14 @@ const DateCalculator = () => {
                       <div className="space-y-4">
                         <div className="bg-white/20 backdrop-blur rounded-lg p-4">
                           <div className="text-sm font-medium mb-1">Từ ngày:</div>
-                          <div className="text-lg font-bold">{formatDate(fromDate.value)}</div>
-                          <div className="text-sm text-blue-100">{formatShortDate(fromDate.value)}</div>
+                          <div className="text-lg font-bold">{formatDate(fromDate)}</div>
+                          <div className="text-sm text-blue-100">{formatShortDate(fromDate)}</div>
                         </div>
 
                         <div className="bg-white/20 backdrop-blur rounded-lg p-4">
                           <div className="text-sm font-medium mb-1">Đến ngày:</div>
-                          <div className="text-lg font-bold">{formatDate(toDate.value)}</div>
-                          <div className="text-sm text-blue-100">{formatShortDate(toDate.value)}</div>
+                          <div className="text-lg font-bold">{formatDate(toDate)}</div>
+                          <div className="text-sm text-blue-100">{formatShortDate(toDate)}</div>
                         </div>
 
                         <div className="bg-white/30 backdrop-blur rounded-lg p-5 border-2 border-white/50">
@@ -600,6 +752,7 @@ const DateCalculator = () => {
                     </div>
                   )}
 
+                  {/* Examples */}
                   <div className="bg-purple-50 border border-purple-200 rounded-lg p-5">
                     <h3 className="font-bold text-purple-900 mb-3 flex items-center gap-2">
                       <ChevronRight className="w-5 h-5" />
@@ -618,8 +771,9 @@ const DateCalculator = () => {
             )}
 
             {/* Working Days Tab */}
-            {activeTab === TABS.WORKING_DAYS && (
+            {activeTab === 'working-days' && (
               <div className="grid md:grid-cols-2 gap-8">
+                {/* Input Form */}
                 <div className="space-y-6">
                   <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200">
                     <h2 className="text-xl font-bold text-blue-900 mb-6 flex items-center gap-2">
@@ -629,23 +783,24 @@ const DateCalculator = () => {
                     
                     <div className="space-y-4">
                       <DateInput
+                        value={workFromDate}
+                        displayValue={workFromDateDisplay}
+                        onChange={setWorkFromDate}
+                        onDisplayChange={setWorkFromDateDisplay}
                         label="Từ ngày"
-                        value={workFromDate.value}
-                        displayValue={workFromDate.displayValue}
-                        onChange={workFromDate.handleInput}
-                        onToday={workFromDate.setToday}
                       />
 
                       <DateInput
+                        value={workToDate}
+                        displayValue={workToDateDisplay}
+                        onChange={setWorkToDate}
+                        onDisplayChange={setWorkToDateDisplay}
                         label="Đến ngày"
-                        value={workToDate.value}
-                        displayValue={workToDate.displayValue}
-                        onChange={workToDate.handleInput}
-                        onToday={workToDate.setToday}
                       />
                     </div>
                   </div>
 
+                  {/* Holiday Info */}
                   <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-5">
                     <h3 className="font-bold text-amber-900 mb-3 flex items-center gap-2">
                       <Calendar className="w-5 h-5" />
@@ -662,8 +817,9 @@ const DateCalculator = () => {
                   </div>
                 </div>
 
+                {/* Results */}
                 <div className="space-y-6">
-                  {workFromDate.value && workToDate.value && (
+                  {workFromDate && workToDate && (
                     <div className="bg-gradient-to-br from-indigo-500 to-blue-600 p-6 rounded-xl text-white shadow-lg">
                       <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                         <Calendar className="w-6 h-6" />
@@ -673,14 +829,14 @@ const DateCalculator = () => {
                       <div className="space-y-4">
                         <div className="bg-white/20 backdrop-blur rounded-lg p-4">
                           <div className="text-sm font-medium mb-1">Từ ngày:</div>
-                          <div className="text-lg font-bold">{formatDate(workFromDate.value)}</div>
-                          <div className="text-sm text-blue-100">{formatShortDate(workFromDate.value)}</div>
+                          <div className="text-lg font-bold">{formatDate(workFromDate)}</div>
+                          <div className="text-sm text-blue-100">{formatShortDate(workFromDate)}</div>
                         </div>
 
                         <div className="bg-white/20 backdrop-blur rounded-lg p-4">
                           <div className="text-sm font-medium mb-1">Đến ngày:</div>
-                          <div className="text-lg font-bold">{formatDate(workToDate.value)}</div>
-                          <div className="text-sm text-blue-100">{formatShortDate(workToDate.value)}</div>
+                          <div className="text-lg font-bold">{formatDate(workToDate)}</div>
+                          <div className="text-sm text-blue-100">{formatShortDate(workToDate)}</div>
                         </div>
 
                         <div className="bg-white/30 backdrop-blur rounded-lg p-5 border-2 border-white/50">
@@ -706,7 +862,8 @@ const DateCalculator = () => {
                     </div>
                   )}
 
-                  {workFromDate.value && workToDate.value && totalDays > 0 && (
+                  {/* Calculation Details */}
+                  {workFromDate && workToDate && totalDays > 0 && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
                       <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2">
                         <ChevronRight className="w-5 h-5" />
@@ -724,6 +881,7 @@ const DateCalculator = () => {
                     </div>
                   )}
 
+                  {/* Examples */}
                   <div className="bg-green-50 border border-green-200 rounded-lg p-5">
                     <h3 className="font-bold text-green-900 mb-3 flex items-center gap-2">
                       <ChevronRight className="w-5 h-5" />
@@ -754,7 +912,7 @@ const DateCalculator = () => {
               Chính xác - Nhanh chóng - Chuyên nghiệp
             </p>
             <p className="text-blue-200 text-xs mt-1">
-              Phiên bản 0.2
+              Phiên bản 1.1
             </p>
           </div>
         </div>
