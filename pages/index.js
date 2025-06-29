@@ -137,9 +137,6 @@ const HomePage = () => {
             <p className="text-blue-100 text-sm mt-1">
               Chính xác - Nhanh chóng - Chuyên nghiệp
             </p>
-            <p className="text-blue-200 text-xs mt-1">
-              Phiên bản 0.1
-            </p>
           </div>
         </div>
       </div>
