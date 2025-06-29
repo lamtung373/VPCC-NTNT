@@ -356,12 +356,12 @@ const DateCalculator = () => {
               <span className="text-sm font-medium hidden sm:inline">Trang chủ</span>
             </button>
             
-            <div className="flex items-center gap-3">
-              <Calendar className="w-10 h-10" />
-              <h1 className="text-3xl md:text-4xl font-bold">Công Cụ Tính Toán Thời Gian</h1>
+            <div className="flex items-center gap-3 flex-1 justify-center px-4">
+              <Calendar className="w-8 h-8 md:w-10 md:h-10" />
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center">Công Cụ Tính Toán Thời Gian</h1>
             </div>
             
-            <div className="w-20"></div> {/* Spacer for balance */}
+            <div className="w-20 sm:w-24"></div> {/* Spacer for balance */}
           </div>
           <p className="text-center text-blue-100 text-lg">Tính toán thời gian và thời hạn hiệu lực văn bản chính xác</p>
         </div>
