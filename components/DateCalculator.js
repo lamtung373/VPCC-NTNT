@@ -136,8 +136,15 @@ const DateCalculator = () => {
 
   // Enhanced date input handler with auto-formatting
   const handleDateInput = useCallback((value, setter, displaySetter) => {
-    // Remove any non-digit characters
-    const cleanValue = value.replace(/\D/g, '');
+    // Allow backspace and delete to work properly
+    if (value === '') {
+      displaySetter('');
+      setter('');
+      return;
+    }
+
+    // Remove any non-digit characters except existing slashes for editing
+    let cleanValue = value.replace(/[^\d]/g, '');
     
     if (cleanValue.length <= 8) {
       let formattedDisplay = cleanValue;
@@ -158,32 +165,41 @@ const DateCalculator = () => {
         const day = cleanValue.slice(0, 2);
         const month = cleanValue.slice(2, 4);
         const year = cleanValue.slice(4, 8);
-        const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
         
-        // Validate date
-        const date = new Date(isoDate);
-        if (date.getFullYear() == year && 
-            date.getMonth() + 1 == month && 
-            date.getDate() == day) {
-          setter(isoDate);
+        // Basic validation
+        const dayNum = parseInt(day);
+        const monthNum = parseInt(month);
+        const yearNum = parseInt(year);
+        
+        if (dayNum >= 1 && dayNum <= 31 && 
+            monthNum >= 1 && monthNum <= 12 && 
+            yearNum >= 1900 && yearNum <= 2100) {
+          
+          const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+          
+          // Additional date validation
+          const date = new Date(isoDate);
+          if (date.getFullYear() == yearNum && 
+              date.getMonth() + 1 == monthNum && 
+              date.getDate() == dayNum) {
+            setter(isoDate);
+          }
         }
-      } else if (cleanValue.length === 0) {
-        setter('');
       }
     }
   }, []);
 
-  // Handle regular date input (from date picker)
-  const handleDatePickerInput = useCallback((value, setter, displaySetter) => {
-    setter(value);
-    if (value) {
-      const date = new Date(value);
-      const formattedDisplay = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-      displaySetter(formattedDisplay);
-    } else {
-      displaySetter('');
-    }
-  }, []);
+  // Handle regular date input - removed since we don't use date picker
+  // const handleDatePickerInput = useCallback((value, setter, displaySetter) => {
+  //   setter(value);
+  //   if (value) {
+  //     const date = new Date(value);
+  //     const formattedDisplay = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+  //     displaySetter(formattedDisplay);
+  //   } else {
+  //     displaySetter('');
+  //   }
+  // }, []);
 
   // Add working days to a date
   const addWorkingDays = useCallback((startDate, daysToAdd, excludeWeekends, excludeHolidays) => {
@@ -362,7 +378,7 @@ const DateCalculator = () => {
     calculateWorkingDays();
   }, [calculateWorkingDays]);
 
-  // Enhanced DateInput component
+  // Enhanced DateInput component - Text input only
   const DateInput = ({ 
     value, 
     displayValue, 
@@ -377,24 +393,14 @@ const DateCalculator = () => {
         {label}
       </label>
       <div className="flex gap-2">
-        <div className="flex-1 relative">
-          <input
-            type="text"
-            value={displayValue}
-            onChange={(e) => handleDateInput(e.target.value, onChange, onDisplayChange)}
-            placeholder={placeholder}
-            maxLength={10}
-            className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-          />
-          {/* Hidden date input for browser date picker */}
-          <input
-            type="date"
-            value={value}
-            onChange={(e) => handleDatePickerInput(e.target.value, onChange, onDisplayChange)}
-            className="absolute inset-0 opacity-0 cursor-pointer"
-            style={{ zIndex: 1 }}
-          />
-        </div>
+        <input
+          type="text"
+          value={displayValue}
+          onChange={(e) => handleDateInput(e.target.value, onChange, onDisplayChange)}
+          placeholder={placeholder}
+          maxLength={10}
+          className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+        />
         {showTodayButton && (
           <button
             onClick={() => setToday(onChange, onDisplayChange)}
