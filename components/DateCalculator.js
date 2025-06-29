@@ -445,11 +445,11 @@ const DateCalculator = () => {
                         </label>
                         <div className="flex gap-2">
                           <input
-                            type="text"
+                            type="date"
                             value={startDate}
-                            onChange={(e) => handleDateInput(e.target.value, setStartDate)}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            onInput={(e) => handleDateInput(e.target.value, setStartDate)}
                             placeholder="dd/mm/yyyy"
-                            maxLength="10"
                             className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                           />
                           <button
@@ -634,7 +634,7 @@ const DateCalculator = () => {
                         <div className="flex gap-2">
                           <input
                             type="text"
-                            value={fromDate}
+                            value={startDate}
                             onChange={(e) => handleDateInput(e.target.value, setStartDate)}
                             placeholder="dd/mm/yyyy"
                             maxLength="10"
@@ -655,11 +655,9 @@ const DateCalculator = () => {
                         </label>
                         <div className="flex gap-2">
                           <input
-                            type="text"
+                            type="date"
                             value={toDate}
-                            onChange={(e) => handleDateInput(e.target.value, setStartDate)}
-                            placeholder="dd/mm/yyyy"
-                            maxLength="10"
+                            onChange={(e) => setToDate(e.target.value)}
                             className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                           />
                           <button
@@ -786,11 +784,9 @@ const DateCalculator = () => {
                         </label>
                         <div className="flex gap-2">
                           <input
-                            type="text"
+                            type="date"
                             value={workFromDate}
-                            onChange={(e) => handleDateInput(e.target.value, setStartDate)}
-                            placeholder="dd/mm/yyyy"
-                            maxLength="10"
+                            onChange={(e) => setWorkFromDate(e.target.value)}
                             className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                           />
                           <button
@@ -808,11 +804,9 @@ const DateCalculator = () => {
                         </label>
                         <div className="flex gap-2">
                           <input
-                            type="text"
+                            type="date"
                             value={workToDate}
-                            onChange={(e) => handleDateInput(e.target.value, setStartDate)}
-                            placeholder="dd/mm/yyyy"
-                            maxLength="10"
+                            onChange={(e) => setWorkToDate(e.target.value)}
                             className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                           />
                           <button
