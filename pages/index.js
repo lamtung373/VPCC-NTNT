@@ -16,7 +16,7 @@ const HomePage = () => {
     },
     {
       id: 'date-calculator',
-      title: 'Tính thời hạn giấy tờ',
+      title: 'Tính toán thời gian',
       description: 'Tính toán thời hạn hiệu lực, ngày hết hạn và số ngày làm việc cho các loại giấy tờ',
       icon: Calendar,
       path: '/date-calculator'
@@ -83,13 +83,45 @@ const HomePage = () => {
               );
             })}
             
-            {/* Placeholder for future tools */}
-            <div className="border-2 border-dashed border-blue-300 rounded-xl p-6 flex items-center justify-center text-gray-500 bg-blue-50/50 min-h-[140px]">
-              <div className="text-center">
-                <FileText className="w-8 h-8 mb-2 mx-auto text-blue-400" />
-                <p className="text-sm font-medium text-blue-600">
-                  Công cụ mới sẽ được cập nhật
-                </p>
+            {/* Contact for new tools */}
+            <div className="group cursor-pointer transform transition-all duration-300 hover:-translate-y-1">
+              <div className="border-2 border-dashed border-blue-300 rounded-xl p-6 bg-gradient-to-br from-blue-50/80 to-indigo-50/80 hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 shadow-lg hover:shadow-2xl">
+                <div className="flex items-start gap-4">
+                  {/* Icon */}
+                  <div className="bg-blue-100 rounded-lg p-3 group-hover:bg-blue-200 transition-colors duration-300">
+                    <FileText className="w-8 h-8 text-blue-600" />
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold text-blue-800 mb-2 group-hover:text-blue-900 transition-colors duration-300">
+                      Đề xuất công cụ mới
+                    </h3>
+                    <p className="text-blue-600 text-sm leading-relaxed mb-4">
+                      Bạn cần công cụ hỗ trợ khác? Chúng tôi sẵn sàng phát triển theo yêu cầu.
+                    </p>
+                    
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-sm">
+                      <div className="text-blue-700 font-medium">Liên hệ: Lâm Tùng</div>
+                      <div className="flex gap-2">
+                        <a 
+                          href="tel:0941108117"
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg transition-colors font-medium text-sm"
+                        >
+                          0941108117
+                        </a>
+                        <a 
+                          href="https://zalo.me/0941108117"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg transition-colors font-medium text-sm"
+                        >
+                          Zalo
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
