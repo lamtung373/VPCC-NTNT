@@ -136,56 +136,75 @@ const DateCalculator = () => {
 
   // Enhanced date input handler with auto-formatting
   const handleDateInput = useCallback((value, setter, displaySetter) => {
-    // Allow backspace and delete to work properly
+    // Handle empty input
     if (value === '') {
       displaySetter('');
       setter('');
       return;
     }
 
-    // Remove any non-digit characters except existing slashes for editing
-    let cleanValue = value.replace(/[^\d]/g, '');
+    // If the value already contains slashes, we need to extract just the numbers
+    // to avoid issues when user is editing
+    let cleanValue;
+    if (value.includes('/')) {
+      // User is editing existing formatted value
+      cleanValue = value.replace(/[^\d]/g, '');
+    } else {
+      // User is typing new numbers
+      cleanValue = value.replace(/[^\d]/g, '');
+    }
     
-    if (cleanValue.length <= 8) {
-      let formattedDisplay = cleanValue;
+    // Limit to 8 digits maximum
+    if (cleanValue.length > 8) {
+      cleanValue = cleanValue.slice(0, 8);
+    }
+    
+    // Format with slashes for display
+    let formattedDisplay = cleanValue;
+    if (cleanValue.length > 2) {
+      formattedDisplay = cleanValue.slice(0, 2) + '/' + cleanValue.slice(2);
+    }
+    if (cleanValue.length > 4) {
+      formattedDisplay = cleanValue.slice(0, 2) + '/' + cleanValue.slice(2, 4) + '/' + cleanValue.slice(4);
+    }
+    
+    // Always update display value to show formatted version
+    displaySetter(formattedDisplay);
+    
+    // Only set the actual date value when we have complete date (8 digits)
+    if (cleanValue.length === 8) {
+      const day = cleanValue.slice(0, 2);
+      const month = cleanValue.slice(2, 4);
+      const year = cleanValue.slice(4, 8);
       
-      // Add slashes automatically for display
-      if (cleanValue.length >= 3) {
-        formattedDisplay = cleanValue.slice(0, 2) + '/' + cleanValue.slice(2);
-      }
-      if (cleanValue.length >= 5) {
-        formattedDisplay = cleanValue.slice(0, 2) + '/' + cleanValue.slice(2, 4) + '/' + cleanValue.slice(4);
-      }
+      // Basic validation
+      const dayNum = parseInt(day);
+      const monthNum = parseInt(month);
+      const yearNum = parseInt(year);
       
-      // Update display value
-      displaySetter(formattedDisplay);
-      
-      // Convert to ISO format when complete (8 digits)
-      if (cleanValue.length === 8) {
-        const day = cleanValue.slice(0, 2);
-        const month = cleanValue.slice(2, 4);
-        const year = cleanValue.slice(4, 8);
+      if (dayNum >= 1 && dayNum <= 31 && 
+          monthNum >= 1 && monthNum <= 12 && 
+          yearNum >= 1900 && yearNum <= 2100) {
         
-        // Basic validation
-        const dayNum = parseInt(day);
-        const monthNum = parseInt(month);
-        const yearNum = parseInt(year);
+        const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
         
-        if (dayNum >= 1 && dayNum <= 31 && 
-            monthNum >= 1 && monthNum <= 12 && 
-            yearNum >= 1900 && yearNum <= 2100) {
-          
-          const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-          
-          // Additional date validation
-          const date = new Date(isoDate);
-          if (date.getFullYear() == yearNum && 
-              date.getMonth() + 1 == monthNum && 
-              date.getDate() == dayNum) {
-            setter(isoDate);
-          }
+        // Additional date validation
+        const date = new Date(isoDate);
+        if (date.getFullYear() == yearNum && 
+            date.getMonth() + 1 == monthNum && 
+            date.getDate() == dayNum) {
+          setter(isoDate);
+        } else {
+          // Invalid date, clear the ISO value but keep the display
+          setter('');
         }
+      } else {
+        // Invalid numbers, clear the ISO value but keep the display
+        setter('');
       }
+    } else {
+      // Incomplete date, clear the ISO value
+      setter('');
     }
   }, []);
 
@@ -399,10 +418,12 @@ const DateCalculator = () => {
           onChange={(e) => handleDateInput(e.target.value, onChange, onDisplayChange)}
           placeholder={placeholder}
           maxLength={10}
+          autoComplete="off"
           className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
         />
         {showTodayButton && (
           <button
+            type="button"
             onClick={() => setToday(onChange, onDisplayChange)}
             className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
           >
