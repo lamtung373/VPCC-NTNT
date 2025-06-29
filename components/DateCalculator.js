@@ -134,8 +134,8 @@ const DateCalculator = () => {
     return true;
   }, [isWeekend, isHoliday]);
 
-  // Enhanced date input handler with auto-formatting
-  const handleDateInput = useCallback((value, setter, displaySetter) => {
+  // Simple date input handler without useCallback to avoid focus issues
+  const handleDateInput = (value, setter, displaySetter) => {
     // Handle empty input
     if (value === '') {
       displaySetter('');
@@ -143,23 +143,13 @@ const DateCalculator = () => {
       return;
     }
 
-    // If the value already contains slashes, we need to extract just the numbers
-    // to avoid issues when user is editing
-    let cleanValue;
-    if (value.includes('/')) {
-      // User is editing existing formatted value
-      cleanValue = value.replace(/[^\d]/g, '');
-    } else {
-      // User is typing new numbers
-      cleanValue = value.replace(/[^\d]/g, '');
-    }
+    // Extract only numbers
+    const cleanValue = value.replace(/[^\d]/g, '');
     
-    // Limit to 8 digits maximum
-    if (cleanValue.length > 8) {
-      cleanValue = cleanValue.slice(0, 8);
-    }
+    // Limit to 8 digits
+    if (cleanValue.length > 8) return;
     
-    // Format with slashes for display
+    // Format with slashes
     let formattedDisplay = cleanValue;
     if (cleanValue.length > 2) {
       formattedDisplay = cleanValue.slice(0, 2) + '/' + cleanValue.slice(2);
@@ -168,16 +158,15 @@ const DateCalculator = () => {
       formattedDisplay = cleanValue.slice(0, 2) + '/' + cleanValue.slice(2, 4) + '/' + cleanValue.slice(4);
     }
     
-    // Always update display value to show formatted version
+    // Update display
     displaySetter(formattedDisplay);
     
-    // Only set the actual date value when we have complete date (8 digits)
+    // Set ISO date when complete
     if (cleanValue.length === 8) {
       const day = cleanValue.slice(0, 2);
       const month = cleanValue.slice(2, 4);
       const year = cleanValue.slice(4, 8);
       
-      // Basic validation
       const dayNum = parseInt(day);
       const monthNum = parseInt(month);
       const yearNum = parseInt(year);
@@ -187,26 +176,22 @@ const DateCalculator = () => {
           yearNum >= 1900 && yearNum <= 2100) {
         
         const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-        
-        // Additional date validation
         const date = new Date(isoDate);
+        
         if (date.getFullYear() == yearNum && 
             date.getMonth() + 1 == monthNum && 
             date.getDate() == dayNum) {
           setter(isoDate);
         } else {
-          // Invalid date, clear the ISO value but keep the display
           setter('');
         }
       } else {
-        // Invalid numbers, clear the ISO value but keep the display
         setter('');
       }
     } else {
-      // Incomplete date, clear the ISO value
       setter('');
     }
-  }, []);
+  };
 
   // Handle regular date input - removed since we don't use date picker
   // const handleDatePickerInput = useCallback((value, setter, displaySetter) => {
@@ -367,22 +352,22 @@ const DateCalculator = () => {
     setHolidayDays(holidays);
   }, [workFromDate, workToDate, isHoliday, isWeekend]);
 
-  // Quick preset handler
-  const applyPreset = useCallback((preset) => {
+  // Quick preset handler - simplified
+  const applyPreset = (preset) => {
     setAddDays(preset.days.toString());
     setAddMonths(preset.months.toString());
     setAddYears(preset.years.toString());
-  }, []);
+  };
 
-  // Set today as default
-  const setToday = useCallback((setter, displaySetter) => {
+  // Set today as default - simplified
+  const setToday = (setter, displaySetter) => {
     const today = new Date();
     const isoDate = today.toISOString().split('T')[0];
     const displayDate = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
     
     setter(isoDate);
     displaySetter(displayDate);
-  }, []);
+  };
 
   // Effects
   useEffect(() => {
