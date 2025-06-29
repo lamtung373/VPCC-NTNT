@@ -8,6 +8,7 @@ const DateCalculator = () => {
   
   // Add Time states
   const [startDate, setStartDate] = useState('');
+  const [startDateDisplay, setStartDateDisplay] = useState('');
   const [addDays, setAddDays] = useState('');
   const [addMonths, setAddMonths] = useState('');
   const [addYears, setAddYears] = useState('');
@@ -17,7 +18,9 @@ const DateCalculator = () => {
   
   // Date Difference states
   const [fromDate, setFromDate] = useState('');
+  const [fromDateDisplay, setFromDateDisplay] = useState('');
   const [toDate, setToDate] = useState('');
+  const [toDateDisplay, setToDateDisplay] = useState('');
   const [daysDifference, setDaysDifference] = useState(0);
   const [monthsDifference, setMonthsDifference] = useState(0);
   const [yearsDifference, setYearsDifference] = useState(0);
@@ -26,7 +29,9 @@ const DateCalculator = () => {
   
   // Working Days states
   const [workFromDate, setWorkFromDate] = useState('');
+  const [workFromDateDisplay, setWorkFromDateDisplay] = useState('');
   const [workToDate, setWorkToDate] = useState('');
+  const [workToDateDisplay, setWorkToDateDisplay] = useState('');
   const [workingDays, setWorkingDays] = useState(0);
   const [totalDays, setTotalDays] = useState(0);
   const [weekendDays, setWeekendDays] = useState(0);
@@ -154,6 +159,59 @@ const DateCalculator = () => {
     }
     
     return current;
+  };
+
+  // Format date input as DD/MM/YYYY
+  const formatDateInput = (input) => {
+    // Remove all non-numeric characters
+    const numbers = input.replace(/\D/g, '');
+    
+    // Limit to 8 digits
+    const limited = numbers.slice(0, 8);
+    
+    // Add slashes at appropriate positions
+    let formatted = '';
+    for (let i = 0; i < limited.length; i++) {
+      if (i === 2 || i === 4) {
+        formatted += '/';
+      }
+      formatted += limited[i];
+    }
+    
+    return formatted;
+  };
+
+  // Convert DD/MM/YYYY to YYYY-MM-DD for date calculations
+  const convertToISODate = (ddmmyyyy) => {
+    const numbers = ddmmyyyy.replace(/\D/g, '');
+    if (numbers.length === 8) {
+      const day = numbers.slice(0, 2);
+      const month = numbers.slice(2, 4);
+      const year = numbers.slice(4, 8);
+      
+      // Validate date
+      const date = new Date(year, month - 1, day);
+      if (date.getFullYear() == year && 
+          date.getMonth() == month - 1 && 
+          date.getDate() == day) {
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      }
+    }
+    return '';
+  };
+
+  // Handle date input with auto-formatting
+  const handleDateInput = (value, displaySetter, dateSetter) => {
+    const formatted = formatDateInput(value);
+    displaySetter(formatted);
+    
+    // Convert to ISO format if complete
+    const isoDate = convertToISODate(formatted);
+    if (isoDate) {
+      dateSetter(isoDate);
+    } else if (formatted.replace(/\D/g, '').length < 8) {
+      dateSetter(''); // Clear if incomplete
+    }
   };
 
   // Add time calculation
@@ -290,43 +348,17 @@ const DateCalculator = () => {
   };
 
   // Set today as default
-  const setToday = (setter) => {
-    const today = new Date().toISOString().split('T')[0];
-    setter(today);
-  };
-
-  // Handle date input with continuous typing
-  const handleDateInput = (value, setter) => {
-    // Remove any non-digit characters
-    const cleanValue = value.replace(/\D/g, '');
+  const setToday = (displaySetter, dateSetter) => {
+    const today = new Date();
+    const day = today.getDate().toString().padStart(2, '0');
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const year = today.getFullYear().toString();
     
-    if (cleanValue.length <= 8) {
-      let formattedValue = cleanValue;
-      
-      // Add slashes automatically
-      if (cleanValue.length >= 3) {
-        formattedValue = cleanValue.slice(0, 2) + '/' + cleanValue.slice(2);
-      }
-      if (cleanValue.length >= 5) {
-        formattedValue = cleanValue.slice(0, 2) + '/' + cleanValue.slice(2, 4) + '/' + cleanValue.slice(4);
-      }
-      
-      setter(formattedValue);
-      
-      // Convert to ISO format when complete
-      if (cleanValue.length === 8) {
-        const day = cleanValue.slice(0, 2);
-        const month = cleanValue.slice(2, 4);
-        const year = cleanValue.slice(4, 8);
-        const isoDate = `${year}-${month}-${day}`;
-        
-        // Validate date
-        const date = new Date(isoDate);
-        if (date.getFullYear() == year && date.getMonth() + 1 == month && date.getDate() == day) {
-          setter(isoDate);
-        }
-      }
-    }
+    const displayFormat = `${day}/${month}/${year}`;
+    const isoFormat = `${year}-${month}-${day}`;
+    
+    displaySetter(displayFormat);
+    dateSetter(isoFormat);
   };
 
   // Effects
@@ -424,20 +456,23 @@ const DateCalculator = () => {
                         </label>
                         <div className="flex gap-2">
                           <input
-                            type="date"
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            onInput={(e) => handleDateInput(e.target.value, setStartDate)}
+                            type="text"
+                            value={startDateDisplay}
+                            onChange={(e) => handleDateInput(e.target.value, setStartDateDisplay, setStartDate)}
                             placeholder="dd/mm/yyyy"
-                            className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-mono text-lg"
+                            maxLength="10"
                           />
                           <button
-                            onClick={() => setToday(setStartDate)}
+                            onClick={() => setToday(setStartDateDisplay, setStartDate)}
                             className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
                           >
                             Hôm nay
                           </button>
                         </div>
+                        {startDateDisplay && !startDate && (
+                          <p className="text-red-500 text-xs mt-1">Vui lòng nhập ngày hợp lệ (dd/mm/yyyy)</p>
+                        )}
                       </div>
 
                       <div className="grid grid-cols-3 gap-3">
@@ -612,18 +647,23 @@ const DateCalculator = () => {
                         </label>
                         <div className="flex gap-2">
                           <input
-                            type="date"
-                            value={fromDate}
-                            onChange={(e) => setFromDate(e.target.value)}
-                            className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            type="text"
+                            value={fromDateDisplay}
+                            onChange={(e) => handleDateInput(e.target.value, setFromDateDisplay, setFromDate)}
+                            placeholder="dd/mm/yyyy"
+                            className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-mono text-lg"
+                            maxLength="10"
                           />
                           <button
-                            onClick={() => setToday(setFromDate)}
+                            onClick={() => setToday(setFromDateDisplay, setFromDate)}
                             className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
                           >
                             Hôm nay
                           </button>
                         </div>
+                        {fromDateDisplay && !fromDate && (
+                          <p className="text-red-500 text-xs mt-1">Vui lòng nhập ngày hợp lệ (dd/mm/yyyy)</p>
+                        )}
                       </div>
 
                       <div>
@@ -632,18 +672,23 @@ const DateCalculator = () => {
                         </label>
                         <div className="flex gap-2">
                           <input
-                            type="date"
-                            value={toDate}
-                            onChange={(e) => setToDate(e.target.value)}
-                            className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            type="text"
+                            value={toDateDisplay}
+                            onChange={(e) => handleDateInput(e.target.value, setToDateDisplay, setToDate)}
+                            placeholder="dd/mm/yyyy"
+                            className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-mono text-lg"
+                            maxLength="10"
                           />
                           <button
-                            onClick={() => setToday(setToDate)}
+                            onClick={() => setToday(setToDateDisplay, setToDate)}
                             className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
                           >
                             Hôm nay
                           </button>
                         </div>
+                        {toDateDisplay && !toDate && (
+                          <p className="text-red-500 text-xs mt-1">Vui lòng nhập ngày hợp lệ (dd/mm/yyyy)</p>
+                        )}
                       </div>
 
                       {/* Exclude options */}
@@ -761,18 +806,23 @@ const DateCalculator = () => {
                         </label>
                         <div className="flex gap-2">
                           <input
-                            type="date"
-                            value={workFromDate}
-                            onChange={(e) => setWorkFromDate(e.target.value)}
-                            className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            type="text"
+                            value={workFromDateDisplay}
+                            onChange={(e) => handleDateInput(e.target.value, setWorkFromDateDisplay, setWorkFromDate)}
+                            placeholder="dd/mm/yyyy"
+                            className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-mono text-lg"
+                            maxLength="10"
                           />
                           <button
-                            onClick={() => setToday(setWorkFromDate)}
+                            onClick={() => setToday(setWorkFromDateDisplay, setWorkFromDate)}
                             className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
                           >
                             Hôm nay
                           </button>
                         </div>
+                        {workFromDateDisplay && !workFromDate && (
+                          <p className="text-red-500 text-xs mt-1">Vui lòng nhập ngày hợp lệ (dd/mm/yyyy)</p>
+                        )}
                       </div>
 
                       <div>
@@ -781,18 +831,23 @@ const DateCalculator = () => {
                         </label>
                         <div className="flex gap-2">
                           <input
-                            type="date"
-                            value={workToDate}
-                            onChange={(e) => setWorkToDate(e.target.value)}
-                            className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            type="text"
+                            value={workToDateDisplay}
+                            onChange={(e) => handleDateInput(e.target.value, setWorkToDateDisplay, setWorkToDate)}
+                            placeholder="dd/mm/yyyy"
+                            className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-mono text-lg"
+                            maxLength="10"
                           />
                           <button
-                            onClick={() => setToday(setWorkToDate)}
+                            onClick={() => setToday(setWorkToDateDisplay, setWorkToDate)}
                             className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
                           >
                             Hôm nay
                           </button>
                         </div>
+                        {workToDateDisplay && !workToDate && (
+                          <p className="text-red-500 text-xs mt-1">Vui lòng nhập ngày hợp lệ (dd/mm/yyyy)</p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -859,24 +914,7 @@ const DateCalculator = () => {
                     </div>
                   )}
 
-                  {/* Calculation Details */}
-                  {workFromDate && workToDate && totalDays > 0 && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
-                      <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2">
-                        <ChevronRight className="w-5 h-5" />
-                        Chi tiết tính toán:
-                      </h3>
-                      <div className="text-sm text-blue-800 space-y-2">
-                        <div>• Tổng số ngày: {totalDays} ngày</div>
-                        <div>• Ngày cuối tuần (T7, CN): {weekendDays} ngày</div>
-                        <div>• Ngày lễ: {holidayDays} ngày</div>
-                        <div>• Ngày làm việc: {workingDays} ngày</div>
-                        <div className="mt-2 pt-2 border-t border-blue-200 text-blue-900 font-semibold">
-                          Công thức: {totalDays} - {weekendDays} - {holidayDays} = {workingDays} ngày làm việc
-                        </div>
-                      </div>
-                    </div>
-                  )}
+
 
                   {/* Examples */}
                   <div className="bg-green-50 border border-green-200 rounded-lg p-5">
@@ -909,7 +947,7 @@ const DateCalculator = () => {
               Chính xác - Nhanh chóng - Chuyên nghiệp
             </p>
             <p className="text-blue-200 text-xs mt-1">
-              Phiên bản 0.1
+              Phiên bản 0.3
             </p>
           </div>
         </div>

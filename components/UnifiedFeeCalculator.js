@@ -1202,7 +1202,7 @@ const UnifiedFeeCalculator = () => {
               Chính xác - Nhanh chóng - Chuyên nghiệp
             </p>
             <p className="text-blue-200 text-xs mt-1">
-              Phiên bản 0.1
+              Phiên bản 0.5
             </p>
           </div>
         </div>
