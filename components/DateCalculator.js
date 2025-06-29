@@ -353,7 +353,7 @@ const DateCalculator = () => {
               className="flex items-center gap-2 text-blue-100 hover:text-white transition-colors duration-200 bg-white/10 backdrop-blur rounded-lg px-3 py-2 hover:bg-white/20"
             >
               <ArrowLeft className="w-5 h-5" />
-              <span className="text-sm font-medium">Trang chủ</span>
+              <span className="text-sm font-medium hidden sm:inline">Trang chủ</span>
             </button>
             
             <div className="flex items-center gap-3">
