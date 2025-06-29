@@ -914,24 +914,7 @@ const DateCalculator = () => {
                     </div>
                   )}
 
-                  {/* Calculation Details */}
-                  {workFromDate && workToDate && totalDays > 0 && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
-                      <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2">
-                        <ChevronRight className="w-5 h-5" />
-                        Chi tiết tính toán:
-                      </h3>
-                      <div className="text-sm text-blue-800 space-y-2">
-                        <div>• Tổng số ngày: {totalDays} ngày</div>
-                        <div>• Ngày cuối tuần (T7, CN): {weekendDays} ngày</div>
-                        <div>• Ngày lễ: {holidayDays} ngày</div>
-                        <div>• Ngày làm việc: {workingDays} ngày</div>
-                        <div className="mt-2 pt-2 border-t border-blue-200 text-blue-900 font-semibold">
-                          Công thức: {totalDays} - {weekendDays} - {holidayDays} = {workingDays} ngày làm việc
-                        </div>
-                      </div>
-                    </div>
-                  )}
+
 
                   {/* Examples */}
                   <div className="bg-green-50 border border-green-200 rounded-lg p-5">
@@ -964,7 +947,7 @@ const DateCalculator = () => {
               Chính xác - Nhanh chóng - Chuyên nghiệp
             </p>
             <p className="text-blue-200 text-xs mt-1">
-              Phiên bản 0.2
+              Phiên bản 0.3
             </p>
           </div>
         </div>
