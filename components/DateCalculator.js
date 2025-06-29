@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Calendar, Clock, Plus, Minus, Calculator, ChevronRight, ArrowLeft } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, Clock, Plus, Minus, Calculator, ChevronRight, Home, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/router';
 
 const DateCalculator = () => {
@@ -8,6 +8,7 @@ const DateCalculator = () => {
   
   // Add Time states
   const [startDate, setStartDate] = useState('');
+  const [startDateDisplay, setStartDateDisplay] = useState('');
   const [addDays, setAddDays] = useState('');
   const [addMonths, setAddMonths] = useState('');
   const [addYears, setAddYears] = useState('');
@@ -17,7 +18,9 @@ const DateCalculator = () => {
   
   // Date Difference states
   const [fromDate, setFromDate] = useState('');
+  const [fromDateDisplay, setFromDateDisplay] = useState('');
   const [toDate, setToDate] = useState('');
+  const [toDateDisplay, setToDateDisplay] = useState('');
   const [daysDifference, setDaysDifference] = useState(0);
   const [monthsDifference, setMonthsDifference] = useState(0);
   const [yearsDifference, setYearsDifference] = useState(0);
@@ -26,39 +29,62 @@ const DateCalculator = () => {
   
   // Working Days states
   const [workFromDate, setWorkFromDate] = useState('');
+  const [workFromDateDisplay, setWorkFromDateDisplay] = useState('');
   const [workToDate, setWorkToDate] = useState('');
+  const [workToDateDisplay, setWorkToDateDisplay] = useState('');
   const [workingDays, setWorkingDays] = useState(0);
   const [totalDays, setTotalDays] = useState(0);
   const [weekendDays, setWeekendDays] = useState(0);
   const [holidayDays, setHolidayDays] = useState(0);
 
-  // Input display states for formatted date inputs
-  const [startDateDisplay, setStartDateDisplay] = useState('');
-  const [fromDateDisplay, setFromDateDisplay] = useState('');
-  const [toDateDisplay, setToDateDisplay] = useState('');
-  const [workFromDateDisplay, setWorkFromDateDisplay] = useState('');
-  const [workToDateDisplay, setWorkToDateDisplay] = useState('');
+  // Danh sách ngày lễ Việt Nam cố định (không phụ thuộc năm cụ thể)
+  const getVietnamHolidays = (year) => {
+    const holidays = [];
+    
+    // Ngày lễ cố định
+    holidays.push(`${year}-01-01`); // Tết Dương lịch
+    holidays.push(`${year}-04-30`); // Ngày Giải phóng miền Nam
+    holidays.push(`${year}-05-01`); // Ngày Quốc tế Lao động
+    holidays.push(`${year}-09-02`); // Ngày Quốc khánh
+    
+    // Tết Nguyên đán (7 ngày) - cần tính theo âm lịch
+    // Đây là xấp xỉ, trong thực tế cần dùng thư viện chuyển đổi lịch
+    const tetDates = getTetDates(year);
+    holidays.push(...tetDates);
+    
+    // Giỗ tổ Hùng Vương (10/3 âm lịch) - xấp xỉ
+    const hungKingDate = getHungKingDate(year);
+    if (hungKingDate) holidays.push(hungKingDate);
+    
+    return holidays;
+  };
 
-  // Memoized holiday data
-  const vietnamHolidays = useMemo(() => ({
-    tetDates: {
+  // Hàm tính ngày Tết (xấp xỉ - trong thực tế cần dùng thư viện chuyển đổi lịch)
+  const getTetDates = (year) => {
+    const tetDates = {
       2024: ['2024-02-08', '2024-02-09', '2024-02-10', '2024-02-11', '2024-02-12', '2024-02-13', '2024-02-14'],
       2025: ['2025-01-27', '2025-01-28', '2025-01-29', '2025-01-30', '2025-01-31', '2025-02-01', '2025-02-02'],
       2026: ['2026-02-16', '2026-02-17', '2026-02-18', '2026-02-19', '2026-02-20', '2026-02-21', '2026-02-22'],
       2027: ['2027-02-05', '2027-02-06', '2027-02-07', '2027-02-08', '2027-02-09', '2027-02-10', '2027-02-11'],
       2028: ['2028-01-25', '2028-01-26', '2028-01-27', '2028-01-28', '2028-01-29', '2028-01-30', '2028-01-31'],
-    },
-    hungKingDates: {
+    };
+    return tetDates[year] || [];
+  };
+
+  // Hàm tính ngày Giỗ tổ Hùng Vương (xấp xỉ)
+  const getHungKingDate = (year) => {
+    const hungKingDates = {
       2024: '2024-04-18',
       2025: '2025-04-07',
       2026: '2026-04-26',
       2027: '2027-04-16',
       2028: '2028-04-04',
-    }
-  }), []);
+    };
+    return hungKingDates[year];
+  };
 
   // Quick preset buttons data
-  const presetPeriods = useMemo(() => [
+  const presetPeriods = [
     { label: '7 ngày', days: 7, months: 0, years: 0 },
     { label: '10 ngày', days: 10, months: 0, years: 0 },
     { label: '15 ngày', days: 15, months: 0, years: 0 },
@@ -75,10 +101,10 @@ const DateCalculator = () => {
     { label: '3 năm', days: 0, months: 0, years: 3 },
     { label: '5 năm', days: 0, months: 0, years: 5 },
     { label: '10 năm', days: 0, months: 0, years: 10 },
-  ], []);
+  ];
 
   // Utility functions
-  const formatDate = useCallback((date) => {
+  const formatDate = (date) => {
     if (!date) return '';
     const d = new Date(date);
     return new Intl.DateTimeFormat('vi-VN', {
@@ -87,127 +113,36 @@ const DateCalculator = () => {
       month: 'long',
       day: 'numeric'
     }).format(d);
-  }, []);
+  };
 
-  const formatShortDate = useCallback((date) => {
+  const formatShortDate = (date) => {
     if (!date) return '';
     const d = new Date(date);
     return new Intl.DateTimeFormat('vi-VN').format(d);
-  }, []);
+  };
 
-  // Get Vietnam holidays for a specific year
-  const getVietnamHolidays = useCallback((year) => {
-    const holidays = [];
-    
-    // Fixed holidays
-    holidays.push(`${year}-01-01`); // Tết Dương lịch
-    holidays.push(`${year}-04-30`); // Ngày Giải phóng miền Nam
-    holidays.push(`${year}-05-01`); // Ngày Quốc tế Lao động
-    holidays.push(`${year}-09-02`); // Ngày Quốc khánh
-    
-    // Tet dates
-    const tetDates = vietnamHolidays.tetDates[year] || [];
-    holidays.push(...tetDates);
-    
-    // Hung King date
-    const hungKingDate = vietnamHolidays.hungKingDates[year];
-    if (hungKingDate) holidays.push(hungKingDate);
-    
-    return holidays;
-  }, [vietnamHolidays]);
-
-  const isHoliday = useCallback((date) => {
+  const isHoliday = (date) => {
     const year = date.getFullYear();
     const holidays = getVietnamHolidays(year);
     const dateStr = date.toISOString().split('T')[0];
     return holidays.includes(dateStr);
-  }, [getVietnamHolidays]);
+  };
 
-  const isWeekend = useCallback((date) => {
+  const isWeekend = (date) => {
     const day = date.getDay();
     return day === 0 || day === 6; // Sunday = 0, Saturday = 6
-  }, []);
+  };
 
-  const isWorkingDay = useCallback((date, excludeWeekends = true, excludeHolidays = true) => {
+  const isWorkingDay = (date, excludeWeekends = true, excludeHolidays = true) => {
     if (excludeWeekends && isWeekend(date)) return false;
     if (excludeHolidays && isHoliday(date)) return false;
     return true;
-  }, [isWeekend, isHoliday]);
-
-  // Simple date input handler without useCallback to avoid focus issues
-  const handleDateInput = (value, setter, displaySetter) => {
-    // Handle empty input
-    if (value === '') {
-      displaySetter('');
-      setter('');
-      return;
-    }
-
-    // Extract only numbers
-    const cleanValue = value.replace(/[^\d]/g, '');
-    
-    // Limit to 8 digits
-    if (cleanValue.length > 8) return;
-    
-    // Format with slashes
-    let formattedDisplay = cleanValue;
-    if (cleanValue.length > 2) {
-      formattedDisplay = cleanValue.slice(0, 2) + '/' + cleanValue.slice(2);
-    }
-    if (cleanValue.length > 4) {
-      formattedDisplay = cleanValue.slice(0, 2) + '/' + cleanValue.slice(2, 4) + '/' + cleanValue.slice(4);
-    }
-    
-    // Update display
-    displaySetter(formattedDisplay);
-    
-    // Set ISO date when complete
-    if (cleanValue.length === 8) {
-      const day = cleanValue.slice(0, 2);
-      const month = cleanValue.slice(2, 4);
-      const year = cleanValue.slice(4, 8);
-      
-      const dayNum = parseInt(day);
-      const monthNum = parseInt(month);
-      const yearNum = parseInt(year);
-      
-      if (dayNum >= 1 && dayNum <= 31 && 
-          monthNum >= 1 && monthNum <= 12 && 
-          yearNum >= 1900 && yearNum <= 2100) {
-        
-        const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-        const date = new Date(isoDate);
-        
-        if (date.getFullYear() == yearNum && 
-            date.getMonth() + 1 == monthNum && 
-            date.getDate() == dayNum) {
-          setter(isoDate);
-        } else {
-          setter('');
-        }
-      } else {
-        setter('');
-      }
-    } else {
-      setter('');
-    }
   };
 
-  // Handle regular date input - removed since we don't use date picker
-  // const handleDatePickerInput = useCallback((value, setter, displaySetter) => {
-  //   setter(value);
-  //   if (value) {
-  //     const date = new Date(value);
-  //     const formattedDisplay = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-  //     displaySetter(formattedDisplay);
-  //   } else {
-  //     displaySetter('');
-  //   }
-  // }, []);
-
   // Add working days to a date
-  const addWorkingDays = useCallback((startDate, daysToAdd, excludeWeekends, excludeHolidays) => {
+  const addWorkingDays = (startDate, daysToAdd, excludeWeekends, excludeHolidays) => {
     if (!excludeWeekends && !excludeHolidays) {
+      // If not excluding anything, just add days normally
       const result = new Date(startDate);
       result.setDate(result.getDate() + daysToAdd);
       return result;
@@ -224,10 +159,63 @@ const DateCalculator = () => {
     }
     
     return current;
-  }, [isWorkingDay]);
+  };
+
+  // Format date input as DD/MM/YYYY
+  const formatDateInput = (input) => {
+    // Remove all non-numeric characters
+    const numbers = input.replace(/\D/g, '');
+    
+    // Limit to 8 digits
+    const limited = numbers.slice(0, 8);
+    
+    // Add slashes at appropriate positions
+    let formatted = '';
+    for (let i = 0; i < limited.length; i++) {
+      if (i === 2 || i === 4) {
+        formatted += '/';
+      }
+      formatted += limited[i];
+    }
+    
+    return formatted;
+  };
+
+  // Convert DD/MM/YYYY to YYYY-MM-DD for date calculations
+  const convertToISODate = (ddmmyyyy) => {
+    const numbers = ddmmyyyy.replace(/\D/g, '');
+    if (numbers.length === 8) {
+      const day = numbers.slice(0, 2);
+      const month = numbers.slice(2, 4);
+      const year = numbers.slice(4, 8);
+      
+      // Validate date
+      const date = new Date(year, month - 1, day);
+      if (date.getFullYear() == year && 
+          date.getMonth() == month - 1 && 
+          date.getDate() == day) {
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      }
+    }
+    return '';
+  };
+
+  // Handle date input with auto-formatting
+  const handleDateInput = (value, displaySetter, dateSetter) => {
+    const formatted = formatDateInput(value);
+    displaySetter(formatted);
+    
+    // Convert to ISO format if complete
+    const isoDate = convertToISODate(formatted);
+    if (isoDate) {
+      dateSetter(isoDate);
+    } else if (formatted.replace(/\D/g, '').length < 8) {
+      dateSetter(''); // Clear if incomplete
+    }
+  };
 
   // Add time calculation
-  const calculateAddTime = useCallback(() => {
+  const calculateAddTime = () => {
     if (!startDate) return;
     
     const start = new Date(startDate);
@@ -254,10 +242,10 @@ const DateCalculator = () => {
     }
     
     setResultDate(result.toISOString().split('T')[0]);
-  }, [startDate, addDays, addMonths, addYears, excludeWeekendsAdd, excludeHolidaysAdd, addWorkingDays]);
+  };
 
   // Date difference calculation
-  const calculateDateDifference = useCallback(() => {
+  const calculateDateDifference = () => {
     if (!fromDate || !toDate) return;
     
     const start = new Date(fromDate);
@@ -273,16 +261,16 @@ const DateCalculator = () => {
     if (excludeWeekendsDiff || excludeHolidaysDiff) {
       // Count working days
       let current = new Date(start);
-      let workingDaysCount = 0;
+      let workingDays = 0;
       
       while (current <= end) {
         if (isWorkingDay(current, excludeWeekendsDiff, excludeHolidaysDiff)) {
-          workingDaysCount++;
+          workingDays++;
         }
         current.setDate(current.getDate() + 1);
       }
       
-      setDaysDifference(workingDaysCount);
+      setDaysDifference(workingDays);
     } else {
       // Calculate total days
       const timeDiff = end.getTime() - start.getTime();
@@ -309,10 +297,10 @@ const DateCalculator = () => {
     
     setYearsDifference(years);
     setMonthsDifference(months);
-  }, [fromDate, toDate, excludeWeekendsDiff, excludeHolidaysDiff, isWorkingDay]);
+  };
 
   // Working days calculation
-  const calculateWorkingDays = useCallback(() => {
+  const calculateWorkingDays = () => {
     if (!workFromDate || !workToDate) return;
     
     const start = new Date(workFromDate);
@@ -350,74 +338,41 @@ const DateCalculator = () => {
     setTotalDays(total);
     setWeekendDays(weekends);
     setHolidayDays(holidays);
-  }, [workFromDate, workToDate, isHoliday, isWeekend]);
+  };
 
-  // Quick preset handler - simplified
+  // Quick preset handler
   const applyPreset = (preset) => {
     setAddDays(preset.days.toString());
     setAddMonths(preset.months.toString());
     setAddYears(preset.years.toString());
   };
 
-  // Set today as default - simplified
-  const setToday = (setter, displaySetter) => {
+  // Set today as default
+  const setToday = (displaySetter, dateSetter) => {
     const today = new Date();
-    const isoDate = today.toISOString().split('T')[0];
-    const displayDate = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
+    const day = today.getDate().toString().padStart(2, '0');
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const year = today.getFullYear().toString();
     
-    setter(isoDate);
-    displaySetter(displayDate);
+    const displayFormat = `${day}/${month}/${year}`;
+    const isoFormat = `${year}-${month}-${day}`;
+    
+    displaySetter(displayFormat);
+    dateSetter(isoFormat);
   };
 
   // Effects
   useEffect(() => {
     calculateAddTime();
-  }, [calculateAddTime]);
+  }, [startDate, addDays, addMonths, addYears, excludeWeekendsAdd, excludeHolidaysAdd]);
 
   useEffect(() => {
     calculateDateDifference();
-  }, [calculateDateDifference]);
+  }, [fromDate, toDate, excludeWeekendsDiff, excludeHolidaysDiff]);
 
   useEffect(() => {
     calculateWorkingDays();
-  }, [calculateWorkingDays]);
-
-  // Enhanced DateInput component - Text input only
-  const DateInput = ({ 
-    value, 
-    displayValue, 
-    onChange, 
-    onDisplayChange, 
-    placeholder = "dd/mm/yyyy",
-    label,
-    showTodayButton = true 
-  }) => (
-    <div>
-      <label className="block text-sm font-semibold text-gray-700 mb-2">
-        {label}
-      </label>
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={displayValue}
-          onChange={(e) => handleDateInput(e.target.value, onChange, onDisplayChange)}
-          placeholder={placeholder}
-          maxLength={10}
-          autoComplete="off"
-          className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-        />
-        {showTodayButton && (
-          <button
-            type="button"
-            onClick={() => setToday(onChange, onDisplayChange)}
-            className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
-          >
-            Hôm nay
-          </button>
-        )}
-      </div>
-    </div>
-  );
+  }, [workFromDate, workToDate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
@@ -438,7 +393,7 @@ const DateCalculator = () => {
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center">Công Cụ Tính Toán Thời Gian</h1>
             </div>
             
-            <div className="w-20 sm:w-24"></div>
+            <div className="w-20 sm:w-24"></div> {/* Spacer for balance */}
           </div>
           <p className="text-center text-blue-100 text-lg">Tính toán thời gian và thời hạn hiệu lực văn bản chính xác</p>
         </div>
@@ -495,13 +450,30 @@ const DateCalculator = () => {
                     </h2>
                     
                     <div className="space-y-4">
-                      <DateInput
-                        value={startDate}
-                        displayValue={startDateDisplay}
-                        onChange={setStartDate}
-                        onDisplayChange={setStartDateDisplay}
-                        label="Ngày bắt đầu"
-                      />
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Ngày bắt đầu
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={startDateDisplay}
+                            onChange={(e) => handleDateInput(e.target.value, setStartDateDisplay, setStartDate)}
+                            placeholder="dd/mm/yyyy"
+                            className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-mono text-lg"
+                            maxLength="10"
+                          />
+                          <button
+                            onClick={() => setToday(setStartDateDisplay, setStartDate)}
+                            className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                          >
+                            Hôm nay
+                          </button>
+                        </div>
+                        {startDateDisplay && !startDate && (
+                          <p className="text-red-500 text-xs mt-1">Vui lòng nhập ngày hợp lệ (dd/mm/yyyy)</p>
+                        )}
+                      </div>
 
                       <div className="grid grid-cols-3 gap-3">
                         <div>
@@ -669,21 +641,55 @@ const DateCalculator = () => {
                     </h2>
                     
                     <div className="space-y-4">
-                      <DateInput
-                        value={fromDate}
-                        displayValue={fromDateDisplay}
-                        onChange={setFromDate}
-                        onDisplayChange={setFromDateDisplay}
-                        label="Từ ngày"
-                      />
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Từ ngày
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={fromDateDisplay}
+                            onChange={(e) => handleDateInput(e.target.value, setFromDateDisplay, setFromDate)}
+                            placeholder="dd/mm/yyyy"
+                            className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-mono text-lg"
+                            maxLength="10"
+                          />
+                          <button
+                            onClick={() => setToday(setFromDateDisplay, setFromDate)}
+                            className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                          >
+                            Hôm nay
+                          </button>
+                        </div>
+                        {fromDateDisplay && !fromDate && (
+                          <p className="text-red-500 text-xs mt-1">Vui lòng nhập ngày hợp lệ (dd/mm/yyyy)</p>
+                        )}
+                      </div>
 
-                      <DateInput
-                        value={toDate}
-                        displayValue={toDateDisplay}
-                        onChange={setToDate}
-                        onDisplayChange={setToDateDisplay}
-                        label="Đến ngày"
-                      />
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Đến ngày
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={toDateDisplay}
+                            onChange={(e) => handleDateInput(e.target.value, setToDateDisplay, setToDate)}
+                            placeholder="dd/mm/yyyy"
+                            className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-mono text-lg"
+                            maxLength="10"
+                          />
+                          <button
+                            onClick={() => setToday(setToDateDisplay, setToDate)}
+                            className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                          >
+                            Hôm nay
+                          </button>
+                        </div>
+                        {toDateDisplay && !toDate && (
+                          <p className="text-red-500 text-xs mt-1">Vui lòng nhập ngày hợp lệ (dd/mm/yyyy)</p>
+                        )}
+                      </div>
 
                       {/* Exclude options */}
                       <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
@@ -794,21 +800,55 @@ const DateCalculator = () => {
                     </h2>
                     
                     <div className="space-y-4">
-                      <DateInput
-                        value={workFromDate}
-                        displayValue={workFromDateDisplay}
-                        onChange={setWorkFromDate}
-                        onDisplayChange={setWorkFromDateDisplay}
-                        label="Từ ngày"
-                      />
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Từ ngày
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={workFromDateDisplay}
+                            onChange={(e) => handleDateInput(e.target.value, setWorkFromDateDisplay, setWorkFromDate)}
+                            placeholder="dd/mm/yyyy"
+                            className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-mono text-lg"
+                            maxLength="10"
+                          />
+                          <button
+                            onClick={() => setToday(setWorkFromDateDisplay, setWorkFromDate)}
+                            className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                          >
+                            Hôm nay
+                          </button>
+                        </div>
+                        {workFromDateDisplay && !workFromDate && (
+                          <p className="text-red-500 text-xs mt-1">Vui lòng nhập ngày hợp lệ (dd/mm/yyyy)</p>
+                        )}
+                      </div>
 
-                      <DateInput
-                        value={workToDate}
-                        displayValue={workToDateDisplay}
-                        onChange={setWorkToDate}
-                        onDisplayChange={setWorkToDateDisplay}
-                        label="Đến ngày"
-                      />
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Đến ngày
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={workToDateDisplay}
+                            onChange={(e) => handleDateInput(e.target.value, setWorkToDateDisplay, setWorkToDate)}
+                            placeholder="dd/mm/yyyy"
+                            className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-mono text-lg"
+                            maxLength="10"
+                          />
+                          <button
+                            onClick={() => setToday(setWorkToDateDisplay, setWorkToDate)}
+                            className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                          >
+                            Hôm nay
+                          </button>
+                        </div>
+                        {workToDateDisplay && !workToDate && (
+                          <p className="text-red-500 text-xs mt-1">Vui lòng nhập ngày hợp lệ (dd/mm/yyyy)</p>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -924,7 +964,7 @@ const DateCalculator = () => {
               Chính xác - Nhanh chóng - Chuyên nghiệp
             </p>
             <p className="text-blue-200 text-xs mt-1">
-              Phiên bản 1.1
+              Phiên bản 0.2
             </p>
           </div>
         </div>
