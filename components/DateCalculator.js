@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 const DateCalculator = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('add-time');
-
+  
   // Add Time states
   const [startDate, setStartDate] = useState('');
   const [addDays, setAddDays] = useState('');
@@ -14,7 +14,7 @@ const DateCalculator = () => {
   const [resultDate, setResultDate] = useState('');
   const [excludeWeekendsAdd, setExcludeWeekendsAdd] = useState(false);
   const [excludeHolidaysAdd, setExcludeHolidaysAdd] = useState(false);
-
+  
   // Date Difference states
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
@@ -23,7 +23,7 @@ const DateCalculator = () => {
   const [yearsDifference, setYearsDifference] = useState(0);
   const [excludeWeekendsDiff, setExcludeWeekendsDiff] = useState(false);
   const [excludeHolidaysDiff, setExcludeHolidaysDiff] = useState(false);
-
+  
   // Working Days states
   const [workFromDate, setWorkFromDate] = useState('');
   const [workToDate, setWorkToDate] = useState('');
@@ -35,22 +35,22 @@ const DateCalculator = () => {
   // Danh sách ngày lễ Việt Nam cố định (không phụ thuộc năm cụ thể)
   const getVietnamHolidays = (year) => {
     const holidays = [];
-
+    
     // Ngày lễ cố định
     holidays.push(`${year}-01-01`); // Tết Dương lịch
     holidays.push(`${year}-04-30`); // Ngày Giải phóng miền Nam
     holidays.push(`${year}-05-01`); // Ngày Quốc tế Lao động
     holidays.push(`${year}-09-02`); // Ngày Quốc khánh
-
+    
     // Tết Nguyên đán (7 ngày) - cần tính theo âm lịch
     // Đây là xấp xỉ, trong thực tế cần dùng thư viện chuyển đổi lịch
     const tetDates = getTetDates(year);
     holidays.push(...tetDates);
-
+    
     // Giỗ tổ Hùng Vương (10/3 âm lịch) - xấp xỉ
     const hungKingDate = getHungKingDate(year);
     if (hungKingDate) holidays.push(hungKingDate);
-
+    
     return holidays;
   };
 
@@ -145,34 +145,34 @@ const DateCalculator = () => {
 
     let current = new Date(startDate);
     let addedDays = 0;
-
+    
     while (addedDays < daysToAdd) {
       current.setDate(current.getDate() + 1);
       if (isWorkingDay(current, excludeWeekends, excludeHolidays)) {
         addedDays++;
       }
     }
-
+    
     return current;
   };
 
   // Add time calculation
   const calculateAddTime = () => {
     if (!startDate) return;
-
+    
     const start = new Date(startDate);
     let result = new Date(start);
-
+    
     // Add years first
     if (addYears) {
       result.setFullYear(result.getFullYear() + parseInt(addYears));
     }
-
+    
     // Add months
     if (addMonths) {
       result.setMonth(result.getMonth() + parseInt(addMonths));
     }
-
+    
     // Add days
     if (addDays) {
       const daysToAdd = parseInt(addDays);
@@ -182,36 +182,36 @@ const DateCalculator = () => {
         result.setDate(result.getDate() + daysToAdd);
       }
     }
-
+    
     setResultDate(result.toISOString().split('T')[0]);
   };
 
   // Date difference calculation
   const calculateDateDifference = () => {
     if (!fromDate || !toDate) return;
-
+    
     const start = new Date(fromDate);
     const end = new Date(toDate);
-
+    
     if (end < start) {
       setDaysDifference(0);
       setMonthsDifference(0);
       setYearsDifference(0);
       return;
     }
-
+    
     if (excludeWeekendsDiff || excludeHolidaysDiff) {
       // Count working days
       let current = new Date(start);
       let workingDays = 0;
-
+      
       while (current <= end) {
         if (isWorkingDay(current, excludeWeekendsDiff, excludeHolidaysDiff)) {
           workingDays++;
         }
         current.setDate(current.getDate() + 1);
       }
-
+      
       setDaysDifference(workingDays);
     } else {
       // Calculate total days
@@ -219,16 +219,16 @@ const DateCalculator = () => {
       const days = Math.ceil(timeDiff / (1000 * 3600 * 24));
       setDaysDifference(days);
     }
-
+    
     // Calculate years and months (always calendar-based)
     let years = end.getFullYear() - start.getFullYear();
     let months = end.getMonth() - start.getMonth();
-
+    
     if (months < 0) {
       years--;
       months += 12;
     }
-
+    
     if (end.getDate() < start.getDate()) {
       months--;
       if (months < 0) {
@@ -236,7 +236,7 @@ const DateCalculator = () => {
         months += 12;
       }
     }
-
+    
     setYearsDifference(years);
     setMonthsDifference(months);
   };
@@ -244,10 +244,10 @@ const DateCalculator = () => {
   // Working days calculation
   const calculateWorkingDays = () => {
     if (!workFromDate || !workToDate) return;
-
+    
     const start = new Date(workFromDate);
     const end = new Date(workToDate);
-
+    
     if (end < start) {
       setWorkingDays(0);
       setTotalDays(0);
@@ -255,16 +255,16 @@ const DateCalculator = () => {
       setHolidayDays(0);
       return;
     }
-
+    
     let current = new Date(start);
     let working = 0;
     let weekends = 0;
     let holidays = 0;
     let total = 0;
-
+    
     while (current <= end) {
       total++;
-
+      
       if (isHoliday(current)) {
         holidays++;
       } else if (isWeekend(current)) {
@@ -272,10 +272,10 @@ const DateCalculator = () => {
       } else {
         working++;
       }
-
+      
       current.setDate(current.getDate() + 1);
     }
-
+    
     setWorkingDays(working);
     setTotalDays(total);
     setWeekendDays(weekends);
@@ -297,36 +297,12 @@ const DateCalculator = () => {
 
   // Handle date input with continuous typing
   const handleDateInput = (value, setter) => {
-    // Allow manual slash input - if user types slash, don't auto-format
-    if (value.includes('/')) {
-      // User is manually typing with slashes, just validate format
-      if (value.match(/^\d{0,2}\/?\d{0,2}\/?\d{0,4}$/)) {
-        setter(value);
-
-        // Try to convert to ISO format if complete
-        const parts = value.split('/');
-        if (parts.length === 3 && parts[0].length === 2 && parts[1].length === 2 && parts[2].length === 4) {
-          const day = parts[0];
-          const month = parts[1];
-          const year = parts[2];
-          const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-
-          // Validate date
-          const date = new Date(isoDate);
-          if (date.getFullYear() == year && date.getMonth() + 1 == month && date.getDate() == day) {
-            setter(isoDate);
-          }
-        }
-      }
-      return;
-    }
-
-    // Auto-format for continuous number input
+    // Remove any non-digit characters
     const cleanValue = value.replace(/\D/g, '');
-
+    
     if (cleanValue.length <= 8) {
       let formattedValue = cleanValue;
-
+      
       // Add slashes automatically
       if (cleanValue.length >= 3) {
         formattedValue = cleanValue.slice(0, 2) + '/' + cleanValue.slice(2);
@@ -334,16 +310,16 @@ const DateCalculator = () => {
       if (cleanValue.length >= 5) {
         formattedValue = cleanValue.slice(0, 2) + '/' + cleanValue.slice(2, 4) + '/' + cleanValue.slice(4);
       }
-
+      
       setter(formattedValue);
-
+      
       // Convert to ISO format when complete
       if (cleanValue.length === 8) {
         const day = cleanValue.slice(0, 2);
         const month = cleanValue.slice(2, 4);
         const year = cleanValue.slice(4, 8);
         const isoDate = `${year}-${month}-${day}`;
-
+        
         // Validate date
         const date = new Date(isoDate);
         if (date.getFullYear() == year && date.getMonth() + 1 == month && date.getDate() == day) {
@@ -379,12 +355,12 @@ const DateCalculator = () => {
               <ArrowLeft className="w-5 h-5" />
               <span className="text-sm font-medium hidden sm:inline">Trang chủ</span>
             </button>
-
+            
             <div className="flex items-center gap-3 flex-1 justify-center px-4">
               <Calendar className="w-8 h-8 md:w-10 md:h-10" />
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center">Công Cụ Tính Toán Thời Gian</h1>
             </div>
-
+            
             <div className="w-20 sm:w-24"></div> {/* Spacer for balance */}
           </div>
           <p className="text-center text-blue-100 text-lg">Tính toán thời gian và thời hạn hiệu lực văn bản chính xác</p>
@@ -395,30 +371,33 @@ const DateCalculator = () => {
           <div className="flex flex-col md:flex-row border-b border-gray-200">
             <button
               onClick={() => setActiveTab('add-time')}
-              className={`flex items-center justify-center gap-2 py-4 px-4 font-semibold transition-all text-sm md:text-base ${activeTab === 'add-time'
-                ? 'bg-blue-50 text-blue-700 border-b-3 border-blue-600'
-                : 'text-gray-600 hover:bg-gray-50'
-                }`}
+              className={`flex items-center justify-center gap-2 py-4 px-4 font-semibold transition-all text-sm md:text-base ${
+                activeTab === 'add-time'
+                  ? 'bg-blue-50 text-blue-700 border-b-3 border-blue-600'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
             >
               <Plus className="w-5 h-5" />
               Cộng Thời Gian
             </button>
             <button
               onClick={() => setActiveTab('date-diff')}
-              className={`flex items-center justify-center gap-2 py-4 px-4 font-semibold transition-all text-sm md:text-base ${activeTab === 'date-diff'
-                ? 'bg-blue-50 text-blue-700 border-b-3 border-blue-600'
-                : 'text-gray-600 hover:bg-gray-50'
-                }`}
+              className={`flex items-center justify-center gap-2 py-4 px-4 font-semibold transition-all text-sm md:text-base ${
+                activeTab === 'date-diff'
+                  ? 'bg-blue-50 text-blue-700 border-b-3 border-blue-600'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
             >
               <Minus className="w-5 h-5" />
               Tính Khoảng Cách
             </button>
             <button
               onClick={() => setActiveTab('working-days')}
-              className={`flex items-center justify-center gap-2 py-4 px-4 font-semibold transition-all text-sm md:text-base ${activeTab === 'working-days'
-                ? 'bg-blue-50 text-blue-700 border-b-3 border-blue-600'
-                : 'text-gray-600 hover:bg-gray-50'
-                }`}
+              className={`flex items-center justify-center gap-2 py-4 px-4 font-semibold transition-all text-sm md:text-base ${
+                activeTab === 'working-days'
+                  ? 'bg-blue-50 text-blue-700 border-b-3 border-blue-600'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
             >
               <Clock className="w-5 h-5" />
               Ngày Làm Việc
@@ -437,7 +416,7 @@ const DateCalculator = () => {
                       <Plus className="w-6 h-6" />
                       Cộng thời gian từ ngày cụ thể
                     </h2>
-
+                    
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -561,7 +540,7 @@ const DateCalculator = () => {
                         <Calendar className="w-6 h-6" />
                         Kết quả tính toán
                       </h2>
-
+                      
                       <div className="space-y-4">
                         <div className="bg-white/20 backdrop-blur rounded-lg p-4">
                           <div className="text-sm font-medium mb-1">Ngày bắt đầu:</div>
@@ -574,7 +553,7 @@ const DateCalculator = () => {
                           <div className="text-lg font-bold">
                             {[
                               addYears && `${addYears} năm`,
-                              addMonths && `${addMonths} tháng`,
+                              addMonths && `${addMonths} tháng`, 
                               addDays && `${addDays} ngày`
                             ].filter(Boolean).join(', ') || 'Không có'}
                           </div>
@@ -625,7 +604,7 @@ const DateCalculator = () => {
                       <Minus className="w-6 h-6" />
                       Tính khoảng cách giữa hai mốc thời gian
                     </h2>
-
+                    
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -633,11 +612,9 @@ const DateCalculator = () => {
                         </label>
                         <div className="flex gap-2">
                           <input
-                            type="text"
-                            value={startDate}
-                            onChange={(e) => handleDateInput(e.target.value, setStartDate)}
-                            placeholder="dd/mm/yyyy"
-                            maxLength="10"
+                            type="date"
+                            value={fromDate}
+                            onChange={(e) => setFromDate(e.target.value)}
                             className="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                           />
                           <button
@@ -708,7 +685,7 @@ const DateCalculator = () => {
                         <Calendar className="w-6 h-6" />
                         Kết quả tính toán
                       </h2>
-
+                      
                       <div className="space-y-4">
                         <div className="bg-white/20 backdrop-blur rounded-lg p-4">
                           <div className="text-sm font-medium mb-1">Từ ngày:</div>
@@ -776,7 +753,7 @@ const DateCalculator = () => {
                       <Clock className="w-6 h-6" />
                       Thống kê ngày làm việc chi tiết
                     </h2>
-
+                    
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -845,7 +822,7 @@ const DateCalculator = () => {
                         <Calendar className="w-6 h-6" />
                         Kết quả thống kê
                       </h2>
-
+                      
                       <div className="space-y-4">
                         <div className="bg-white/20 backdrop-blur rounded-lg p-4">
                           <div className="text-sm font-medium mb-1">Từ ngày:</div>
@@ -920,7 +897,7 @@ const DateCalculator = () => {
             )}
           </div>
         </div>
-
+        
         {/* Footer */}
         <div className="mt-8 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-lg shadow-xl p-6">
           <div className="text-center">
