@@ -87,7 +87,7 @@ const HomePage = () => {
                 "address": {
                   "@type": "PostalAddress",
                   "addressCountry": "VN",
-                  "addressRegion": "Bình Dương"
+                  "addressRegion": "Hồ Chí Minh"
                 }
               },
               "featureList": [
