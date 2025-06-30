@@ -300,88 +300,88 @@ const UnifiedFeeCalculator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-2 sm:p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-t-2xl p-8 text-white shadow-xl">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-t-2xl p-4 sm:p-8 text-white shadow-xl">
           <div className="flex items-center justify-between mb-4">
             <button
               onClick={() => router.push('/')}
-              className="flex items-center gap-2 text-blue-100 hover:text-white transition-colors duration-200 bg-white/10 backdrop-blur rounded-lg px-3 py-2 hover:bg-white/20"
+              className="flex items-center gap-2 text-blue-100 hover:text-white transition-colors duration-200 bg-white/10 backdrop-blur rounded-lg px-2 sm:px-3 py-2 hover:bg-white/20"
             >
-              <ArrowLeft className="w-5 h-5" />
-              <span className="text-sm font-medium hidden sm:inline">Trang chủ</span>
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-xs sm:text-sm font-medium hidden sm:inline">Trang chủ</span>
             </button>
             
-            <div className="flex items-center gap-3 flex-1 justify-center px-4">
-              <Calculator className="w-8 h-8 md:w-10 md:h-10" />
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center">Công Cụ Tính Phí Công Chứng</h1>
+            <div className="flex items-center gap-2 sm:gap-3 flex-1 justify-center px-2 sm:px-4">
+              <Calculator className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />
+              <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center leading-tight">Công Cụ Tính Phí Công Chứng</h1>
             </div>
             
-            <div className="w-20 sm:w-24"></div> {/* Spacer for balance */}
+            <div className="w-12 sm:w-20 md:w-24"></div> {/* Spacer for balance */}
           </div>
-          <p className="text-center text-blue-100 text-lg">Tính toán nhanh chóng và chính xác phí dịch thuật và công chứng</p>
+          <p className="text-center text-blue-100 text-sm sm:text-lg">Tính toán nhanh chóng và chính xác phí dịch thuật và công chứng</p>
         </div>
 
         {/* Tabs */}
         <div className="bg-white shadow-xl rounded-b-2xl">
-          <div className="flex flex-col md:flex-row border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row border-b border-gray-200 overflow-x-auto">
             <button
               onClick={() => setActiveTab('translation')}
-              className={`flex items-center justify-center gap-2 py-4 px-4 font-semibold transition-all text-sm md:text-base ${
+              className={`flex items-center justify-center gap-1 sm:gap-2 py-3 sm:py-4 px-2 sm:px-4 font-semibold transition-all text-xs sm:text-sm md:text-base whitespace-nowrap ${
                 activeTab === 'translation'
                   ? 'bg-blue-50 text-blue-700 border-b-3 border-blue-600'
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <Globe className="w-5 h-5" />
-              Phí Dịch Thuật & Công Chứng
+              <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="break-words">Phí Dịch Thuật & Công Chứng</span>
             </button>
             <button
               onClick={() => setActiveTab('notary')}
-              className={`flex items-center justify-center gap-2 py-4 px-4 font-semibold transition-all text-sm md:text-base ${
+              className={`flex items-center justify-center gap-1 sm:gap-2 py-3 sm:py-4 px-2 sm:px-4 font-semibold transition-all text-xs sm:text-sm md:text-base whitespace-nowrap ${
                 activeTab === 'notary'
                   ? 'bg-blue-50 text-blue-700 border-b-3 border-blue-600'
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <Scale className="w-5 h-5" />
-              Phí Công Chứng Hợp Đồng
+              <Scale className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="break-words">Phí Công Chứng Hợp Đồng</span>
             </button>
             <button
               onClick={() => setActiveTab('certification')}
-              className={`flex items-center justify-center gap-2 py-4 px-4 font-semibold transition-all text-sm md:text-base ${
+              className={`flex items-center justify-center gap-1 sm:gap-2 py-3 sm:py-4 px-2 sm:px-4 font-semibold transition-all text-xs sm:text-sm md:text-base whitespace-nowrap ${
                 activeTab === 'certification'
                   ? 'bg-blue-50 text-blue-700 border-b-3 border-blue-600'
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <FileCheck className="w-5 h-5" />
-              Phí Chứng Thực Bản Sao
+              <FileCheck className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="break-words">Phí Chứng Thực Bản Sao</span>
             </button>
             <button
               onClick={() => setActiveTab('notarizedCopy')}
-              className={`flex items-center justify-center gap-2 py-4 px-4 font-semibold transition-all text-sm md:text-base ${
+              className={`flex items-center justify-center gap-1 sm:gap-2 py-3 sm:py-4 px-2 sm:px-4 font-semibold transition-all text-xs sm:text-sm md:text-base whitespace-nowrap ${
                 activeTab === 'notarizedCopy'
                   ? 'bg-blue-50 text-blue-700 border-b-3 border-blue-600'
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <Copy className="w-5 h-5" />
-              Phí Cấp Bản Sao Công Chứng
+              <Copy className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="break-words">Phí Cấp Bản Sao Công Chứng</span>
             </button>
           </div>
 
           {/* Tab Content */}
-          <div className="p-6 md:p-8">
+          <div className="p-4 sm:p-6 md:p-8">
             {/* Translation Tab */}
             {activeTab === 'translation' && (
-              <div className="grid md:grid-cols-2 gap-8">
+              <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
                 {/* Input Form */}
-                <div className="space-y-6">
-                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200">
-                    <h2 className="text-xl font-bold text-blue-900 mb-6 flex items-center gap-2">
-                      <FileText className="w-6 h-6" />
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 sm:p-6 rounded-xl border border-blue-200">
+                    <h2 className="text-lg sm:text-xl font-bold text-blue-900 mb-4 sm:mb-6 flex items-center gap-2">
+                      <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
                       Thông tin dịch thuật
                     </h2>
                     
@@ -393,7 +393,7 @@ const UnifiedFeeCalculator = () => {
                         <select
                           value={direction}
                           onChange={(e) => setDirection(e.target.value)}
-                          className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          className="w-full p-2 sm:p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                         >
                           <option value="to-vietnamese">Từ tiếng nước ngoài sang tiếng Việt</option>
                           <option value="from-vietnamese">Từ tiếng Việt sang tiếng nước ngoài</option>
@@ -407,7 +407,7 @@ const UnifiedFeeCalculator = () => {
                         <select
                           value={language}
                           onChange={(e) => setLanguage(e.target.value)}
-                          className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          className="w-full p-2 sm:p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                         >
                           {Object.entries(languageNames).map(([key, name]) => (
                             <option key={key} value={key}>{name}</option>
@@ -422,7 +422,7 @@ const UnifiedFeeCalculator = () => {
                         <select
                           value={complexity}
                           onChange={(e) => setComplexity(e.target.value)}
-                          className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          className="w-full p-2 sm:p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                         >
                           <option value="simple">Đơn giản</option>
                           <option value="complex">Phức tạp</option>
@@ -439,9 +439,9 @@ const UnifiedFeeCalculator = () => {
                             value={pages}
                             onChange={(e) => handleNumberInput(e.target.value, setPages)}
                             placeholder="Nhập số trang"
-                            className="w-full p-3 pr-16 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            className="w-full p-2 sm:p-3 pr-12 sm:pr-16 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                           />
-                          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                          <span className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm">
                             trang
                           </span>
                         </div>
@@ -457,9 +457,9 @@ const UnifiedFeeCalculator = () => {
                             value={copies}
                             onChange={(e) => handleNumberInput(e.target.value, setCopies)}
                             placeholder="Nhập số bản"
-                            className="w-full p-3 pr-16 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            className="w-full p-2 sm:p-3 pr-12 sm:pr-16 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                           />
-                          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                          <span className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm">
                             bản
                           </span>
                         </div>
@@ -471,9 +471,9 @@ const UnifiedFeeCalculator = () => {
                           id="similarContent"
                           checked={isSimilarContent}
                           onChange={(e) => setIsSimilarContent(e.target.checked)}
-                          className="w-5 h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500"
+                          className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500"
                         />
-                        <label htmlFor="similarContent" className="ml-3 text-sm text-gray-700">
+                        <label htmlFor="similarContent" className="ml-2 sm:ml-3 text-xs sm:text-sm text-gray-700 break-words">
                           Nội dung các trang tương tự nhau (hộ khẩu, học bạ...)
                         </label>
                       </div>
@@ -482,36 +482,36 @@ const UnifiedFeeCalculator = () => {
                 </div>
 
                 {/* Results */}
-                <div className="space-y-6">
-                  <div className="bg-gradient-to-br from-indigo-500 to-blue-600 p-6 rounded-xl text-white shadow-lg">
-                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                      <FileText className="w-6 h-6" />
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="bg-gradient-to-br from-indigo-500 to-blue-600 p-4 sm:p-6 rounded-xl text-white shadow-lg">
+                    <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
+                      <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
                       Kết quả tính toán
                     </h2>
                     
-                    <div className="space-y-4">
-                      <div className="bg-white/20 backdrop-blur rounded-lg p-4">
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="bg-white/20 backdrop-blur rounded-lg p-3 sm:p-4">
                         <div className="flex justify-between items-center">
-                          <span className="font-medium">Phí dịch thuật:</span>
-                          <span className="text-xl font-bold">
+                          <span className="font-medium text-sm sm:text-base">Phí dịch thuật:</span>
+                          <span className="text-lg sm:text-xl font-bold break-words">
                             {formatCurrency(translationFee)}
                           </span>
                         </div>
                       </div>
 
-                      <div className="bg-white/20 backdrop-blur rounded-lg p-4">
+                      <div className="bg-white/20 backdrop-blur rounded-lg p-3 sm:p-4">
                         <div className="flex justify-between items-center">
-                          <span className="font-medium">Phí công chứng:</span>
-                          <span className="text-xl font-bold">
+                          <span className="font-medium text-sm sm:text-base">Phí công chứng:</span>
+                          <span className="text-lg sm:text-xl font-bold break-words">
                             {formatCurrency(notarizationFee)}
                           </span>
                         </div>
                       </div>
 
-                      <div className="bg-white/30 backdrop-blur rounded-lg p-5 border-2 border-white/50">
+                      <div className="bg-white/30 backdrop-blur rounded-lg p-4 sm:p-5 border-2 border-white/50">
                         <div className="flex justify-between items-center">
-                          <span className="text-lg font-bold">Tổng chi phí:</span>
-                          <span className="text-2xl font-bold">
+                          <span className="text-sm sm:text-lg font-bold">Tổng chi phí:</span>
+                          <span className="text-xl sm:text-2xl font-bold break-words">
                             {formatCurrency(totalTranslationFee)}
                           </span>
                         </div>
@@ -520,12 +520,12 @@ const UnifiedFeeCalculator = () => {
                   </div>
 
                   {/* Details */}
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
-                    <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2">
-                      <ChevronRight className="w-5 h-5" />
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-5">
+                    <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2 text-sm sm:text-base">
+                      <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                       Chi tiết tính toán:
                     </h3>
-                    <div className="text-sm text-blue-800 space-y-2">
+                    <div className="text-xs sm:text-sm text-blue-800 space-y-1 sm:space-y-2">
                       <div>• Hướng dịch: {direction === 'to-vietnamese' ? 'Từ tiếng nước ngoài sang tiếng Việt' : 'Từ tiếng Việt sang tiếng nước ngoài'}</div>
                       <div>• Ngôn ngữ: {languageNames[language]}</div>
                       <div>• Độ phức tạp: {complexity === 'simple' ? 'Đơn giản' : 'Phức tạp'}</div>
@@ -552,14 +552,14 @@ const UnifiedFeeCalculator = () => {
                   </div>
 
                   {/* Fee Table Info */}
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-5">
-                    <h3 className="font-bold text-green-900 mb-3 flex items-center gap-2">
-                      <Globe className="w-5 h-5" />
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 sm:p-5">
+                    <h3 className="font-bold text-green-900 mb-3 flex items-center gap-2 text-sm sm:text-base">
+                      <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
                       Bảng phí dịch thuật:
                     </h3>
-                    <div className="text-sm text-green-800 space-y-1">
+                    <div className="text-xs sm:text-sm text-green-800 space-y-1">
                       <div className="font-semibold mb-2">{direction === 'to-vietnamese' ? 'Từ tiếng nước ngoài sang tiếng Việt:' : 'Từ tiếng Việt sang tiếng nước ngoài:'}</div>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div>
                           <div className="font-medium underline mb-1">Văn bản đơn giản:</div>
                           <div>• Tiếng Anh, Hoa: <span className="font-medium">{formatCurrency(translationRates[direction]['simple']['english'])}/trang</span></div>
@@ -587,12 +587,12 @@ const UnifiedFeeCalculator = () => {
 
             {/* Notary Tab */}
             {activeTab === 'notary' && (
-              <div className="grid md:grid-cols-2 gap-8">
+              <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
                 {/* Input Form */}
-                <div className="space-y-6">
-                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200">
-                    <h2 className="text-xl font-bold text-blue-900 mb-6 flex items-center gap-2">
-                      <Scale className="w-6 h-6" />
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 sm:p-6 rounded-xl border border-blue-200">
+                    <h2 className="text-lg sm:text-xl font-bold text-blue-900 mb-4 sm:mb-6 flex items-center gap-2">
+                      <Scale className="w-5 h-5 sm:w-6 sm:h-6" />
                       Thông tin hợp đồng
                     </h2>
                     
@@ -604,7 +604,7 @@ const UnifiedFeeCalculator = () => {
                         <select
                           value={contractType}
                           onChange={(e) => setContractType(e.target.value)}
-                          className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          className="w-full p-2 sm:p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                         >
                           <option value="">-- Chọn loại hợp đồng --</option>
                           <option value="economic">Hợp đồng kinh tế, thương mại, đầu tư, kinh doanh</option>
@@ -622,9 +622,9 @@ const UnifiedFeeCalculator = () => {
                             value={contractValue}
                             onChange={(e) => handleNumberInput(e.target.value, setContractValue)}
                             placeholder="Nhập giá trị hợp đồng"
-                            className="w-full p-3 pr-16 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            className="w-full p-2 sm:p-3 pr-12 sm:pr-16 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                           />
-                          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                          <span className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm">
                             VND
                           </span>
                         </div>
@@ -640,9 +640,9 @@ const UnifiedFeeCalculator = () => {
                             value={serviceFee}
                             onChange={(e) => handleNumberInput(e.target.value, setServiceFee)}
                             placeholder="Nhập thù lao"
-                            className="w-full p-3 pr-16 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            className="w-full p-2 sm:p-3 pr-12 sm:pr-16 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                           />
-                          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                          <span className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm">
                             VND
                           </span>
                         </div>
@@ -658,9 +658,9 @@ const UnifiedFeeCalculator = () => {
                             value={copyFee}
                             onChange={(e) => handleNumberInput(e.target.value, setCopyFee)}
                             placeholder="Nhập phí sao y"
-                            className="w-full p-3 pr-16 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            className="w-full p-2 sm:p-3 pr-12 sm:pr-16 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                           />
-                          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                          <span className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm">
                             VND
                           </span>
                         </div>
@@ -669,48 +669,48 @@ const UnifiedFeeCalculator = () => {
                   </div>
                 </div>
 
-                                  {/* Results */}
-                <div className="space-y-6">
+                {/* Results */}
+                <div className="space-y-4 sm:space-y-6">
                   {(contractType && parseFloat(contractValue.replace(/\./g, '')) > 0) && (
                     <>
-                      <div className="bg-gradient-to-br from-indigo-500 to-blue-600 p-6 rounded-xl text-white shadow-lg animate-fadeIn">
-                        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                          <FileText className="w-6 h-6" />
+                      <div className="bg-gradient-to-br from-indigo-500 to-blue-600 p-4 sm:p-6 rounded-xl text-white shadow-lg animate-fadeIn">
+                        <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
+                          <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
                           Kết quả tính toán
                         </h2>
                         
-                        <div className="space-y-4">
-                          <div className="bg-white/20 backdrop-blur rounded-lg p-4">
+                        <div className="space-y-3 sm:space-y-4">
+                          <div className="bg-white/20 backdrop-blur rounded-lg p-3 sm:p-4">
                             <div className="flex justify-between items-center">
-                              <span className="font-medium">Phí công chứng:</span>
-                              <span className="text-xl font-bold">
+                              <span className="font-medium text-sm sm:text-base">Phí công chứng:</span>
+                              <span className="text-lg sm:text-xl font-bold break-words">
                                 {formatCurrency(notaryFee)}
                               </span>
                             </div>
                           </div>
 
-                          <div className="bg-white/20 backdrop-blur rounded-lg p-4">
+                          <div className="bg-white/20 backdrop-blur rounded-lg p-3 sm:p-4">
                             <div className="flex justify-between items-center">
-                              <span className="font-medium">Thù lao:</span>
-                              <span className="text-xl font-bold">
+                              <span className="font-medium text-sm sm:text-base">Thù lao:</span>
+                              <span className="text-lg sm:text-xl font-bold break-words">
                                 {formatCurrency(parseFloat(serviceFee.replace(/\./g, '')) || 0)}
                               </span>
                             </div>
                           </div>
 
-                          <div className="bg-white/20 backdrop-blur rounded-lg p-4">
+                          <div className="bg-white/20 backdrop-blur rounded-lg p-3 sm:p-4">
                             <div className="flex justify-between items-center">
-                              <span className="font-medium">Phí sao y:</span>
-                              <span className="text-xl font-bold">
+                              <span className="font-medium text-sm sm:text-base">Phí sao y:</span>
+                              <span className="text-lg sm:text-xl font-bold break-words">
                                 {formatCurrency(parseFloat(copyFee.replace(/\./g, '')) || 0)}
                               </span>
                             </div>
                           </div>
 
-                          <div className="bg-white/30 backdrop-blur rounded-lg p-5 border-2 border-white/50">
-                            <div className="flex justify-between items-center">
-                              <span className="text-lg font-bold">TỔNG PHÍ PHẢI THANH TOÁN:</span>
-                              <span className="text-2xl font-bold">
+                          <div className="bg-white/30 backdrop-blur rounded-lg p-4 sm:p-5 border-2 border-white/50">
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                              <span className="text-sm sm:text-lg font-bold">TỔNG PHÍ PHẢI THANH TOÁN:</span>
+                              <span className="text-xl sm:text-2xl font-bold break-words">
                                 {formatCurrency(totalNotaryFee)}
                               </span>
                             </div>
@@ -719,12 +719,12 @@ const UnifiedFeeCalculator = () => {
                       </div>
 
                       {/* Calculation Details */}
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
-                        <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2">
-                          <ChevronRight className="w-5 h-5" />
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-5">
+                        <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2 text-sm sm:text-base">
+                          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                           Chi tiết tính toán:
                         </h3>
-                        <div className="text-sm text-blue-800 space-y-2">
+                        <div className="text-xs sm:text-sm text-blue-800 space-y-1 sm:space-y-2">
                           <div>• Loại hợp đồng: {contractType === 'economic' ? 'Kinh tế, thương mại, đầu tư, kinh doanh' : 'Thuê quyền sử dụng đất, thuê nhà ở, thuê tài sản'}</div>
                           <div>• Giá trị hợp đồng: {formatCurrency(parseFloat(contractValue.replace(/\./g, '')) || 0)}</div>
                           {(() => {
@@ -775,13 +775,13 @@ const UnifiedFeeCalculator = () => {
                   )}
 
                   {/* Fee Table Info */}
-                  <div className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-lg p-5">
-                    <h3 className="font-bold text-indigo-900 mb-3 flex items-center gap-2">
-                      <Scale className="w-5 h-5" />
+                  <div className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-lg p-4 sm:p-5">
+                    <h3 className="font-bold text-indigo-900 mb-3 flex items-center gap-2 text-sm sm:text-base">
+                      <Scale className="w-4 h-4 sm:w-5 sm:h-5" />
                       Bảng phí công chứng hợp đồng:
                     </h3>
                     {contractType === 'economic' ? (
-                      <div className="text-sm text-indigo-800 space-y-1">
+                      <div className="text-xs sm:text-sm text-indigo-800 space-y-1">
                         <div className="font-semibold mb-2">Hợp đồng kinh tế, thương mại, đầu tư, kinh doanh:</div>
                         <div>• Dưới 50 triệu: <span className="font-medium">50,000 VND</span></div>
                         <div>• 50-100 triệu: <span className="font-medium">100,000 VND</span></div>
@@ -794,7 +794,7 @@ const UnifiedFeeCalculator = () => {
                         <div className="text-orange-600 font-semibold mt-2">⚠️ Mức thu tối đa: 70,000,000 VND</div>
                       </div>
                     ) : contractType === 'rental' ? (
-                      <div className="text-sm text-indigo-800 space-y-1">
+                      <div className="text-xs sm:text-sm text-indigo-800 space-y-1">
                         <div className="font-semibold mb-2">Hợp đồng thuê (đất, nhà, tài sản):</div>
                         <div>• Dưới 50 triệu: <span className="font-medium">40,000 VND</span></div>
                         <div>• 50-100 triệu: <span className="font-medium">80,000 VND</span></div>
@@ -806,7 +806,7 @@ const UnifiedFeeCalculator = () => {
                         <div className="text-orange-600 font-semibold mt-2">⚠️ Mức thu tối đa: 8,000,000 VND</div>
                       </div>
                     ) : (
-                      <div className="text-sm text-gray-600">
+                      <div className="text-xs sm:text-sm text-gray-600">
                         Vui lòng chọn loại hợp đồng để xem bảng phí chi tiết
                       </div>
                     )}
@@ -817,12 +817,12 @@ const UnifiedFeeCalculator = () => {
 
             {/* Certification Tab */}
             {activeTab === 'certification' && (
-              <div className="grid md:grid-cols-2 gap-8">
+              <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
                 {/* Input Form */}
-                <div className="space-y-6">
-                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200">
-                    <h2 className="text-xl font-bold text-blue-900 mb-6 flex items-center gap-2">
-                      <FileCheck className="w-6 h-6" />
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 sm:p-6 rounded-xl border border-blue-200">
+                    <h2 className="text-lg sm:text-xl font-bold text-blue-900 mb-4 sm:mb-6 flex items-center gap-2">
+                      <FileCheck className="w-5 h-5 sm:w-6 sm:h-6" />
                       Thông tin chứng thực
                     </h2>
                     
@@ -837,9 +837,9 @@ const UnifiedFeeCalculator = () => {
                             value={certPages}
                             onChange={(e) => handleNumberInput(e.target.value, setCertPages)}
                             placeholder="Nhập số trang"
-                            className="w-full p-3 pr-16 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            className="w-full p-2 sm:p-3 pr-12 sm:pr-16 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                           />
-                          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                          <span className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm">
                             trang
                           </span>
                         </div>
@@ -855,9 +855,9 @@ const UnifiedFeeCalculator = () => {
                             value={certCopies}
                             onChange={(e) => handleNumberInput(e.target.value, setCertCopies)}
                             placeholder="Nhập số bản"
-                            className="w-full p-3 pr-16 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            className="w-full p-2 sm:p-3 pr-12 sm:pr-16 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                           />
-                          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                          <span className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm">
                             bản
                           </span>
                         </div>
@@ -866,12 +866,12 @@ const UnifiedFeeCalculator = () => {
                   </div>
 
                   {/* Fee Structure Info */}
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-5">
-                    <h3 className="font-bold text-green-900 mb-3 flex items-center gap-2">
-                      <Copy className="w-5 h-5" />
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 sm:p-5">
+                    <h3 className="font-bold text-green-900 mb-3 flex items-center gap-2 text-sm sm:text-base">
+                      <Copy className="w-4 h-4 sm:w-5 sm:h-5" />
                       Cơ cấu phí chứng thực:
                     </h3>
-                    <div className="text-sm text-green-800 space-y-2">
+                    <div className="text-xs sm:text-sm text-green-800 space-y-2">
                       <div>• Trang 1-2: <span className="font-semibold">2,000 VND/trang</span></div>
                       <div>• Từ trang 3 trở đi: <span className="font-semibold">1,000 VND/trang</span></div>
                       <div>• Mức thu tối đa: <span className="font-semibold">200,000 VND/bản</span></div>
@@ -880,36 +880,36 @@ const UnifiedFeeCalculator = () => {
                 </div>
 
                 {/* Results */}
-                <div className="space-y-6">
-                  <div className="bg-gradient-to-br from-indigo-500 to-blue-600 p-6 rounded-xl text-white shadow-lg">
-                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                      <FileText className="w-6 h-6" />
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="bg-gradient-to-br from-indigo-500 to-blue-600 p-4 sm:p-6 rounded-xl text-white shadow-lg">
+                    <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
+                      <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
                       Kết quả tính toán
                     </h2>
                     
-                    <div className="space-y-4">
-                      <div className="bg-white/20 backdrop-blur rounded-lg p-4">
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="bg-white/20 backdrop-blur rounded-lg p-3 sm:p-4">
                         <div className="flex justify-between items-center">
-                          <span className="font-medium">Số trang:</span>
-                          <span className="text-xl font-bold">
+                          <span className="font-medium text-sm sm:text-base">Số trang:</span>
+                          <span className="text-lg sm:text-xl font-bold">
                             {parseInt(certPages.replace(/\./g, '')) || 1} trang
                           </span>
                         </div>
                       </div>
 
-                      <div className="bg-white/20 backdrop-blur rounded-lg p-4">
+                      <div className="bg-white/20 backdrop-blur rounded-lg p-3 sm:p-4">
                         <div className="flex justify-between items-center">
-                          <span className="font-medium">Số bản:</span>
-                          <span className="text-xl font-bold">
+                          <span className="font-medium text-sm sm:text-base">Số bản:</span>
+                          <span className="text-lg sm:text-xl font-bold">
                             {parseInt(certCopies.replace(/\./g, '')) || 1} bản
                           </span>
                         </div>
                       </div>
 
-                      <div className="bg-white/30 backdrop-blur rounded-lg p-5 border-2 border-white/50">
+                      <div className="bg-white/30 backdrop-blur rounded-lg p-4 sm:p-5 border-2 border-white/50">
                         <div className="flex justify-between items-center">
-                          <span className="text-lg font-bold">Tổng phí chứng thực:</span>
-                          <span className="text-2xl font-bold">
+                          <span className="text-sm sm:text-lg font-bold">Tổng phí chứng thực:</span>
+                          <span className="text-xl sm:text-2xl font-bold break-words">
                             {formatCurrency(certificationFee)}
                           </span>
                         </div>
@@ -918,12 +918,12 @@ const UnifiedFeeCalculator = () => {
                   </div>
 
                   {/* Calculation Details */}
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
-                    <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2">
-                      <ChevronRight className="w-5 h-5" />
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-5">
+                    <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2 text-sm sm:text-base">
+                      <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                       Chi tiết tính toán:
                     </h3>
-                    <div className="text-sm text-blue-800 space-y-2">
+                    <div className="text-xs sm:text-sm text-blue-800 space-y-1 sm:space-y-2">
                       {(() => {
                         const pagesNum = parseInt(certPages.replace(/\./g, '')) || 1;
                         const copiesNum = parseInt(certCopies.replace(/\./g, '')) || 1;
@@ -1004,12 +1004,12 @@ const UnifiedFeeCalculator = () => {
 
             {/* Notarized Copy Tab */}
             {activeTab === 'notarizedCopy' && (
-              <div className="grid md:grid-cols-2 gap-8">
+              <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
                 {/* Input Form */}
-                <div className="space-y-6">
-                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200">
-                    <h2 className="text-xl font-bold text-blue-900 mb-6 flex items-center gap-2">
-                      <Copy className="w-6 h-6" />
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 sm:p-6 rounded-xl border border-blue-200">
+                    <h2 className="text-lg sm:text-xl font-bold text-blue-900 mb-4 sm:mb-6 flex items-center gap-2">
+                      <Copy className="w-5 h-5 sm:w-6 sm:h-6" />
                       Thông tin bản sao công chứng
                     </h2>
                     
@@ -1024,9 +1024,9 @@ const UnifiedFeeCalculator = () => {
                             value={notarizedPages}
                             onChange={(e) => handleNumberInput(e.target.value, setNotarizedPages)}
                             placeholder="Nhập số trang"
-                            className="w-full p-3 pr-16 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            className="w-full p-2 sm:p-3 pr-12 sm:pr-16 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                           />
-                          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                          <span className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm">
                             trang
                           </span>
                         </div>
@@ -1042,9 +1042,9 @@ const UnifiedFeeCalculator = () => {
                             value={notarizedCopies}
                             onChange={(e) => handleNumberInput(e.target.value, setNotarizedCopies)}
                             placeholder="Nhập số bản"
-                            className="w-full p-3 pr-16 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            className="w-full p-2 sm:p-3 pr-12 sm:pr-16 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
                           />
-                          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                          <span className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm">
                             bản
                           </span>
                         </div>
@@ -1053,12 +1053,12 @@ const UnifiedFeeCalculator = () => {
                   </div>
 
                   {/* Fee Structure Info */}
-                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-5">
-                    <h3 className="font-bold text-purple-900 mb-3 flex items-center gap-2">
-                      <FileText className="w-5 h-5" />
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4 sm:p-5">
+                    <h3 className="font-bold text-purple-900 mb-3 flex items-center gap-2 text-sm sm:text-base">
+                      <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
                       Cơ cấu phí cấp bản sao:
                     </h3>
-                    <div className="text-sm text-purple-800 space-y-2">
+                    <div className="text-xs sm:text-sm text-purple-800 space-y-2">
                       <div>• Trang 1-2: <span className="font-semibold">5,000 VND/trang</span></div>
                       <div>• Từ trang 3 trở đi: <span className="font-semibold">3,000 VND/trang</span></div>
                       <div>• Mức thu tối đa: <span className="font-semibold">100,000 VND/bản</span></div>
@@ -1067,36 +1067,36 @@ const UnifiedFeeCalculator = () => {
                 </div>
 
                 {/* Results */}
-                <div className="space-y-6">
-                  <div className="bg-gradient-to-br from-indigo-500 to-blue-600 p-6 rounded-xl text-white shadow-lg">
-                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                      <FileText className="w-6 h-6" />
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="bg-gradient-to-br from-indigo-500 to-blue-600 p-4 sm:p-6 rounded-xl text-white shadow-lg">
+                    <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
+                      <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
                       Kết quả tính toán
                     </h2>
                     
-                    <div className="space-y-4">
-                      <div className="bg-white/20 backdrop-blur rounded-lg p-4">
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="bg-white/20 backdrop-blur rounded-lg p-3 sm:p-4">
                         <div className="flex justify-between items-center">
-                          <span className="font-medium">Số trang:</span>
-                          <span className="text-xl font-bold">
+                          <span className="font-medium text-sm sm:text-base">Số trang:</span>
+                          <span className="text-lg sm:text-xl font-bold">
                             {parseInt(notarizedPages.replace(/\./g, '')) || 1} trang
                           </span>
                         </div>
                       </div>
 
-                      <div className="bg-white/20 backdrop-blur rounded-lg p-4">
+                      <div className="bg-white/20 backdrop-blur rounded-lg p-3 sm:p-4">
                         <div className="flex justify-between items-center">
-                          <span className="font-medium">Số bản sao:</span>
-                          <span className="text-xl font-bold">
+                          <span className="font-medium text-sm sm:text-base">Số bản sao:</span>
+                          <span className="text-lg sm:text-xl font-bold">
                             {parseInt(notarizedCopies.replace(/\./g, '')) || 1} bản
                           </span>
                         </div>
                       </div>
 
-                      <div className="bg-white/30 backdrop-blur rounded-lg p-5 border-2 border-white/50">
+                      <div className="bg-white/30 backdrop-blur rounded-lg p-4 sm:p-5 border-2 border-white/50">
                         <div className="flex justify-between items-center">
-                          <span className="text-lg font-bold">Tổng phí cấp bản sao:</span>
-                          <span className="text-2xl font-bold">
+                          <span className="text-sm sm:text-lg font-bold">Tổng phí cấp bản sao:</span>
+                          <span className="text-xl sm:text-2xl font-bold break-words">
                             {formatCurrency(notarizedCopyFee)}
                           </span>
                         </div>
@@ -1105,12 +1105,12 @@ const UnifiedFeeCalculator = () => {
                   </div>
 
                   {/* Calculation Details */}
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
-                    <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2">
-                      <ChevronRight className="w-5 h-5" />
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-5">
+                    <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2 text-sm sm:text-base">
+                      <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                       Chi tiết tính toán:
                     </h3>
-                    <div className="text-sm text-blue-800 space-y-2">
+                    <div className="text-xs sm:text-sm text-blue-800 space-y-1 sm:space-y-2">
                       {(() => {
                         const pagesNum = parseInt(notarizedPages.replace(/\./g, '')) || 1;
                         const copiesNum = parseInt(notarizedCopies.replace(/\./g, '')) || 1;
@@ -1192,13 +1192,13 @@ const UnifiedFeeCalculator = () => {
         </div>
         
         {/* Footer */}
-        <div className="mt-8 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-lg shadow-xl p-6">
+        <div className="mt-6 sm:mt-8 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-lg shadow-xl p-4 sm:p-6">
           <div className="text-center">
-            <p className="text-white font-bold text-lg flex items-center justify-center gap-2">
-              <Scale className="w-5 h-5" />
+            <p className="text-white font-bold text-sm sm:text-lg flex items-center justify-center gap-2">
+              <Scale className="w-4 h-4 sm:w-5 sm:h-5" />
               © {new Date().getFullYear()} VPCC Nguyễn Thị Như Trang - Nguyễn Tùng Lâm
             </p>
-            <p className="text-blue-100 text-sm mt-1">
+            <p className="text-blue-100 text-xs sm:text-sm mt-1">
               Chính xác - Nhanh chóng - Chuyên nghiệp
             </p>
             <p className="text-blue-200 text-xs mt-1">
