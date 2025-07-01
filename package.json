@@ -1,6 +1,6 @@
 {
-  "name": "vpcc-fee-calculator",
-  "version": "1.0.0",
+  "name": "vpcc-ntnt",
+  "version": "0.0.10",
   "private": true,
   "dependencies": {
     "react": "^18.2.0",
